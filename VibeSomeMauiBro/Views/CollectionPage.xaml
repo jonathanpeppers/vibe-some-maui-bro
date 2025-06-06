@@ -6,6 +6,7 @@
              x:Class="VibeSomeMauiBro.Views.CollectionPage"
              x:DataType="views:CollectionPage"
              Title="My Collection"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="#1a1a1a">
 
     <Grid>
