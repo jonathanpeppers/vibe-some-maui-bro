@@ -8,7 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
@@ -19,7 +22,7 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Install MAUI workloads
-      run: dotnet workload install maui-android
+      run: dotnet workload install maui
 
     - name: Restore dependencies
       run: dotnet restore VibeSomeMauiBro/VibeSomeMauiBro.csproj
