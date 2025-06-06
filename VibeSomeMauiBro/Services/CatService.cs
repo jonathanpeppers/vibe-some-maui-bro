@@ -125,7 +125,7 @@ public class CatService : ICatService
         {
             if (File.Exists(_likedCatsFilePath))
             {
-                using var fileStream = new FileStream(_likedCatsFilePath, FileMode.Open, FileAccess.Read);
+                using var fileStream = File.OpenRead(_likedCatsFilePath);
                 var likedCats = await JsonSerializer.DeserializeAsync(fileStream, CatApiJsonContext.Default.ListCat);
                 if (likedCats != null)
                 {
@@ -148,7 +148,7 @@ public class CatService : ICatService
     {
         try
         {
-            using var fileStream = new FileStream(_likedCatsFilePath, FileMode.Create, FileAccess.Write);
+            using var fileStream = File.Create(_likedCatsFilePath);
             await JsonSerializer.SerializeAsync(fileStream, _likedCats.ToList(), CatApiJsonContext.Default.ListCat);
         }
         catch (Exception ex)

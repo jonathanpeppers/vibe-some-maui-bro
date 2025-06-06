@@ -116,8 +116,11 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
 - **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead
 - **Property Change Notifications**: Use `BindableObject.OnPropertyChanged()` for MAUI pages/views - BindableObject already implements `INotifyPropertyChanged`
-- **Collections Performance**: Use `HashSet<T>` instead of `List<T>` for membership testing and duplicate prevention
+- **Collections Performance**: Use `HashSet<T>` instead of `List<T>` for membership testing and duplicate prevention - convert to `List<T>` only when needed for serialization
 - **JSON Serialization**: Use System.Text.Json source generators for better performance - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation)
+- **File I/O Efficiency**: Use `File.OpenRead()` and `File.Create()` instead of manually creating `FileStream` objects for better readability and performance
+- **Stream-based JSON**: Always use `JsonSerializer.DeserializeAsync()` and `JsonSerializer.SerializeAsync()` with file streams - never load entire file content into memory as strings
+- **Error Logging**: Use `ILogger` for proper error logging in real applications - log warnings for recoverable errors and errors for critical failures
 - **XAML Compiled Bindings**: Always use compiled bindings with `x:DataType` to improve runtime performance and enable compile-time binding validation - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/data-binding/compiled-bindings?view=net-maui-9.0)
 - **Warnings as Errors**: Project configured to treat all warnings as errors via `Directory.Build.props` to ensure code quality
 
@@ -132,17 +135,18 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - ✅ **Swipe Interface**: Card-based UI with swipe animations
 - ✅ **Touch Gestures**: Pan gesture recognizer for natural swipe interactions
 - ✅ **Like/Dislike Actions**: Button and gesture-based cat selection
-- ✅ **Collection Storage**: In-memory storage of liked cats
+- ✅ **Collection Storage**: JSON file-based persistent storage of liked cats with cross-session persistence
 - ✅ **Navigation**: Tab-based navigation between swipe and collection screens
 - ✅ **Responsive UI**: Works on Android (primary target platform)
 - ✅ **Fallback Data**: Local cat images when API is unavailable
 
 #### Technical Patterns Used:
-- **Dependency Injection**: HttpClient and CatService registered in MauiProgram
+- **Dependency Injection**: HttpClient and CatService registered in MauiProgram with ILogger support
 - **Data Binding**: Basic data binding for collection view
 - **Gesture Recognition**: PanGestureRecognizer for swipe detection
-- **Async/Await**: Proper async patterns for API calls
-- **Error Handling**: Try-catch with fallback data for offline scenarios
+- **Async/Await**: Proper async patterns for API calls and file I/O operations
+- **Error Handling**: Try-catch with fallback data for offline scenarios and graceful file I/O error handling
+- **File Persistence**: JSON file storage using System.Text.Json source generators with cross-platform file paths
 
 #### API Integration:
 - Uses **The Cat API** (https://api.thecatapi.com/v1/images/search) - see [docs/CatApi.md](../docs/CatApi.md)
