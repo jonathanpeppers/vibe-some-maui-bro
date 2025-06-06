@@ -16,6 +16,7 @@ public class CatService : ICatService
     private readonly HttpClient _httpClient;
     private readonly HashSet<Cat> _likedCats = new();
     private readonly HashSet<string> _seenCatIds = new(StringComparer.Ordinal);
+    private static Random _random = new();
 
     public CatService(HttpClient httpClient)
     {
@@ -56,12 +57,30 @@ public class CatService : ICatService
                 _seenCatIds.Add(cat.Id);
             }
 
+            // 1 in 1000 chance for epic cat (only if we haven't seen it before)
+            if (_random.Next(1000) == 0 && !_seenCatIds.Contains("epic_cat_legendary"))
+            {
+                var epicCat = CreateEpicCat();
+                cats.Insert(0, epicCat); // Add at the beginning for immediate visibility
+                _seenCatIds.Add(epicCat.Id);
+            }
+
             return cats;
         }
         catch (Exception)
         {
             // Return fallback data if API fails
-            return GetFallbackCats(count);
+            var fallbackCats = GetFallbackCats(count);
+            
+            // 1 in 1000 chance for epic cat (only if we haven't seen it before)
+            if (_random.Next(1000) == 0 && !_seenCatIds.Contains("epic_cat_legendary"))
+            {
+                var epicCat = CreateEpicCat();
+                fallbackCats.Insert(0, epicCat); // Add at the beginning for immediate visibility
+                _seenCatIds.Add(epicCat.Id);
+            }
+            
+            return fallbackCats;
         }
     }
 
@@ -84,6 +103,17 @@ public class CatService : ICatService
         cat.LikedAt = null;
         _likedCats.Remove(cat);
         return Task.CompletedTask;
+    }
+
+    private static Cat CreateEpicCat()
+    {
+        return new Cat
+        {
+            Id = "epic_cat_legendary",
+            ImageUrl = "epic_cat.png", // Embedded image
+            Breed = "Legendary Epic Cat",
+            Description = "🌟 LEGENDARY EPIC CAT! 🌟 Ultra rare and magnificent! You are incredibly lucky to see this majestic creature!"
+        };
     }
 
     private static List<Cat> GetFallbackCats(int count)
