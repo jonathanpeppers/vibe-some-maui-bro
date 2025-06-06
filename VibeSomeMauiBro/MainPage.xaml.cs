@@ -10,6 +10,7 @@ public partial class MainPage : ContentPage
 	private readonly ICatService _catService;
 	private readonly List<Cat> _currentCats = new();
 	private int _currentCatIndex = 0;
+	private double _lastTotalX = 0, _lastTotalY = 0;
 	private ContentView? _currentCatCard;
 
 	public MainPage(ICatService catService)
@@ -219,15 +220,16 @@ public partial class MainPage : ContentPage
 				// Change opacity based on swipe distance
 				var swipeDistance = Math.Abs(e.TotalX);
 				card.Opacity = Math.Max(0.5, 1 - (swipeDistance / 200));
+				_lastTotalX = e.TotalX;
 				break;
 
 			case GestureStatus.Completed:
 				// Determine if swipe was significant enough
-				if (Math.Abs(e.TotalX) > threshold)
+				if (Math.Abs(_lastTotalX) > threshold)
 				{
 					// Animate card off screen
-					var direction = e.TotalX > 0 ? 1 : -1;
-					await card.TranslateTo(direction * 400, e.TotalY, 250, Easing.CubicOut);
+					var direction = _lastTotalX > 0 ? 1 : -1;
+					await card.TranslateTo(direction * 400, _lastTotalY, 250, Easing.CubicOut);
 					
 					// Process the swipe
 					if (direction > 0)
@@ -250,6 +252,8 @@ public partial class MainPage : ContentPage
 					);
 					card.Opacity = 1;
 				}
+				_lastTotalX = 0;
+				_lastTotalY = 0;
 				break;
 
 			case GestureStatus.Canceled:
@@ -259,6 +263,8 @@ public partial class MainPage : ContentPage
 					card.RotateTo(0, 250, Easing.SpringOut)
 				);
 				card.Opacity = 1;
+				_lastTotalX = 0;
+				_lastTotalY = 0;
 				break;
 		}
 	}
