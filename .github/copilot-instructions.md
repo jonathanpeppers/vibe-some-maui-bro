@@ -83,9 +83,11 @@ VibeSomeMauiBro/
 ### Continuous Integration
 
 The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) that:
-- Runs on Ubuntu with .NET 9
+- Runs on Windows and macOS with .NET 9
 - Installs MAUI Android workloads
-- Builds the project in Release configuration
+- Uses conditional build configuration:
+  - **Pull Requests**: Build in Debug mode (faster CI feedback)
+  - **Main branch pushes, release tags**: Build in Release mode (optimized for deployment)
 
 ### Future Development
 
