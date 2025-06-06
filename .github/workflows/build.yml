@@ -1,0 +1,28 @@
+name: Build .NET MAUI App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Install MAUI workloads
+      run: dotnet workload install maui-android
+
+    - name: Restore dependencies
+      run: dotnet restore VibeSomeMauiBro.csproj
+
+    - name: Build
+      run: dotnet build VibeSomeMauiBro.csproj --configuration Release --no-restore
