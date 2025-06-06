@@ -41,7 +41,15 @@ public class CatService : ICatService
         }
         
         // Ensure directory exists
-        Directory.CreateDirectory(Path.GetDirectoryName(_likedCatsFilePath)!);
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(_likedCatsFilePath)!);
+        }
+        catch (Exception)
+        {
+            // If directory creation fails, continue with the file path anyway
+            // The load/save operations will handle errors gracefully
+        }
         
         // Load existing liked cats
         LoadLikedCatsAsync().Wait();

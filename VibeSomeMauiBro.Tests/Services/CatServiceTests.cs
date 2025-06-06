@@ -325,4 +325,56 @@ public class CatServiceTests : IDisposable
         Assert.Contains(likedAfterDisliking, c => c.Id == "cat3");
         Assert.DoesNotContain(likedAfterDisliking, c => c.Id == "cat2");
     }
+
+    [Fact]
+    public async Task LikedCats_PersistedToFile_AndLoadedOnNewServiceInstance()
+    {
+        // Arrange
+        var tempFilePath = Path.Combine(Path.GetTempPath(), $"test_persistence_{Guid.NewGuid()}.json");
+        var cat1 = new Cat { Id = "persist1", ImageUrl = "https://example.com/persist1.jpg" };
+        var cat2 = new Cat { Id = "persist2", ImageUrl = "https://example.com/persist2.jpg" };
+
+        try
+        {
+            // Act - Create first service instance and like some cats
+            using var httpClient1 = new HttpClient(new MockHttpMessageHandler());
+            var catService1 = new CatService(httpClient1, tempFilePath);
+            await catService1.LikeCatAsync(cat1);
+            await catService1.LikeCatAsync(cat2);
+
+            // Act - Create second service instance with same file path
+            using var httpClient2 = new HttpClient(new MockHttpMessageHandler());
+            var catService2 = new CatService(httpClient2, tempFilePath);
+            var persistedCats = await catService2.GetLikedCatsAsync();
+
+            // Assert
+            Assert.Equal(2, persistedCats.Count);
+            Assert.Contains(persistedCats, c => c.Id == "persist1");
+            Assert.Contains(persistedCats, c => c.Id == "persist2");
+            Assert.All(persistedCats, cat => Assert.True(cat.IsLiked));
+            Assert.All(persistedCats, cat => Assert.NotNull(cat.LikedAt));
+        }
+        finally
+        {
+            // Cleanup
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task FileSystemError_DuringLoad_StartsWithEmptyCollection()
+    {
+        // Arrange - Use an invalid file path to simulate load error
+        var invalidPath = Path.Combine("/invalid/path/that/does/not/exist", "test.json");
+
+        // Act & Assert - Should not throw and should start with empty collection
+        using var httpClient = new HttpClient(new MockHttpMessageHandler());
+        var catService = new CatService(httpClient, invalidPath);
+        var likedCats = await catService.GetLikedCatsAsync();
+
+        Assert.Empty(likedCats);
+    }
 }
