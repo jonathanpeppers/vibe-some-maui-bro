@@ -1,7 +1,6 @@
 name: Copilot Development Environment Setup
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   setup:
