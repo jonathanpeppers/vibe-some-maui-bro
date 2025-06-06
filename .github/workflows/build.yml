@@ -38,6 +38,13 @@ jobs:
     - name: Build
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
 
+    - name: List build outputs for debugging
+      run: |
+        echo "Build outputs:"
+        find VibeSomeMauiBro/bin/Release -type f -name "*.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
+        find VibeSomeMauiBro/bin/Release -name "*.app" -type d | head -10 || true
+      shell: bash
+
     - name: Collect Android artifacts
       if: runner.os == 'Linux' || runner.os == 'Windows' || runner.os == 'macOS'
       run: |
@@ -63,18 +70,28 @@ jobs:
     - name: Collect iOS artifacts  
       if: runner.os == 'macOS'
       run: |
-        # Copy iOS IPA files if they exist
+        # Copy iOS artifacts if they exist (IPA, or at least the built assemblies)
         if [ -d "VibeSomeMauiBro/bin/Release/net9.0-ios" ]; then
           cp VibeSomeMauiBro/bin/Release/net9.0-ios/*.ipa artifacts/ 2>/dev/null || true
+          # If no IPA, copy the built assemblies for inspection
+          if [ ! -f artifacts/*.ipa ]; then
+            mkdir -p artifacts/ios-assemblies
+            cp VibeSomeMauiBro/bin/Release/net9.0-ios/*.dll artifacts/ios-assemblies/ 2>/dev/null || true
+          fi
         fi
       shell: bash
 
     - name: Collect macOS artifacts
       if: runner.os == 'macOS' 
       run: |
-        # Copy macOS .app bundles if they exist
+        # Copy macOS artifacts (.app bundles or built assemblies)
         if [ -d "VibeSomeMauiBro/bin/Release/net9.0-maccatalyst" ]; then
           find VibeSomeMauiBro/bin/Release/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
+          # If no .app bundle, copy the built assemblies for inspection  
+          if [ ! -d artifacts/*.app ]; then
+            mkdir -p artifacts/maccatalyst-assemblies
+            cp VibeSomeMauiBro/bin/Release/net9.0-maccatalyst/*.dll artifacts/maccatalyst-assemblies/ 2>/dev/null || true
+          fi
         fi
       shell: bash
 
