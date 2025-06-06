@@ -29,10 +29,4 @@ jobs:
       run: dotnet restore VibeSomeMauiBro/VibeSomeMauiBro.csproj
 
     - name: Build project (verification)
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --no-restore
-
-    - name: Setup complete
-      run: |
-        echo "✅ Development environment setup complete!"
-        echo "📱 .NET MAUI Android development environment is ready"
-        echo "🛠️ You can now build and develop the CatSwipe application"
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --no-restore
