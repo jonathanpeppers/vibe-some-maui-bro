@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace VibeSomeMauiBro.Models;
 
 public class Cat
@@ -21,4 +23,10 @@ public class Breed
 {
     public string Name { get; set; } = "";
     public string? Description { get; set; }
+}
+
+[JsonSerializable(typeof(CatApiResponse[]))]
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+public partial class CatApiJsonContext : JsonSerializerContext
+{
 }

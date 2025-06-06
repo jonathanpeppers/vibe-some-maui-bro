@@ -14,8 +14,8 @@ public interface ICatService
 public class CatService : ICatService
 {
     private readonly HttpClient _httpClient;
-    private readonly List<Cat> _likedCats = new();
-    private readonly List<string> _seenCatIds = new();
+    private readonly HashSet<Cat> _likedCats = new();
+    private readonly HashSet<string> _seenCatIds = new(StringComparer.Ordinal);
 
     public CatService(HttpClient httpClient)
     {
@@ -28,10 +28,7 @@ public class CatService : ICatService
         {
             // Using The Cat API - free tier allows 10 requests per minute
             var response = await _httpClient.GetStringAsync($"https://api.thecatapi.com/v1/images/search?limit={count}&has_breeds=1");
-            var catApiResponses = JsonSerializer.Deserialize<CatApiResponse[]>(response, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var catApiResponses = JsonSerializer.Deserialize(response, CatApiJsonContext.Default.CatApiResponseArray);
 
             if (catApiResponses == null) return new List<Cat>();
 
@@ -47,7 +44,10 @@ public class CatService : ICatService
                 .ToList();
 
             // Mark as seen
-            _seenCatIds.AddRange(cats.Select(c => c.Id));
+            foreach (var cat in cats)
+            {
+                _seenCatIds.Add(cat.Id);
+            }
 
             return cats;
         }
@@ -67,10 +67,7 @@ public class CatService : ICatService
     {
         cat.IsLiked = true;
         cat.LikedAt = DateTime.Now;
-        if (!_likedCats.Any(c => c.Id == cat.Id))
-        {
-            _likedCats.Add(cat);
-        }
+        _likedCats.Add(cat);
         return Task.CompletedTask;
     }
 
@@ -78,7 +75,7 @@ public class CatService : ICatService
     {
         cat.IsLiked = false;
         cat.LikedAt = null;
-        _likedCats.RemoveAll(c => c.Id == cat.Id);
+        _likedCats.Remove(cat);
         return Task.CompletedTask;
     }
 

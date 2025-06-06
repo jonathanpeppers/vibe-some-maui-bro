@@ -101,7 +101,9 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - **String Literals**: Always use `""` instead of `string.Empty` for empty string initialization
 - **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
 - **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead
-- **Property Change Notifications**: Implement `INotifyPropertyChanged` for data-bound properties that can change at runtime
+- **Property Change Notifications**: Use `BindableObject.OnPropertyChanged()` for MAUI pages/views - BindableObject already implements `INotifyPropertyChanged`
+- **Collections Performance**: Use `HashSet<T>` instead of `List<T>` for membership testing and duplicate prevention
+- **JSON Serialization**: Use System.Text.Json source generators for better performance - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation)
 
 #### Core Components Implemented:
 - **Models/Cat.cs**: Data models for cat information and API responses

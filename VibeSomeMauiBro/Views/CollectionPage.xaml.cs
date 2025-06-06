@@ -1,13 +1,12 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using VibeSomeMauiBro.Models;
 using VibeSomeMauiBro.Services;
 
 namespace VibeSomeMauiBro.Views;
 
-public partial class CollectionPage(ICatService catService) : ContentPage, INotifyPropertyChanged
+public partial class CollectionPage : ContentPage
 {
-    private readonly ICatService _catService = catService;
+    private readonly ICatService _catService;
     
     private ObservableCollection<Cat> _likedCats = new();
     public ObservableCollection<Cat> LikedCats 
@@ -20,11 +19,16 @@ public partial class CollectionPage(ICatService catService) : ContentPage, INoti
         }
     }
 
+    public CollectionPage(ICatService catService)
+    {
+        _catService = catService;
+        InitializeComponent();
+        BindingContext = this;
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        InitializeComponent();
-        BindingContext = this;
         _ = LoadLikedCatsAsync();
     }
 
@@ -39,12 +43,5 @@ public partial class CollectionPage(ICatService catService) : ContentPage, INoti
         {
             await DisplayAlert("Error", $"Failed to load your cat collection: {ex.Message}", "OK");
         }
-    }
-
-    public new event PropertyChangedEventHandler? PropertyChanged;
-
-    protected new virtual void OnPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
