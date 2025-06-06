@@ -22,7 +22,7 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Install MAUI workloads
-      run: dotnet workload install maui --version 9.0.102
+      run: dotnet workload install maui --version 9.0.100
 
     - name: Build
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release
