@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using VibeSomeMauiBro.Services;
+using VibeSomeMauiBro.Views;
 
 namespace VibeSomeMauiBro;
 
@@ -14,6 +16,12 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
+
+		// Register services
+		builder.Services.AddSingleton<HttpClient>();
+		builder.Services.AddScoped<ICatService, CatService>();
+		builder.Services.AddSingleton<MainPage>();
+		builder.Services.AddTransient<CollectionPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
