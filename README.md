@@ -34,7 +34,7 @@ CatSwipe is a fun, engaging mobile application that brings the addictive swiping
 - Create shared collections with other cat enthusiasts
 - Comment and rate cats
 
-## 📱 App Screenshots
+## 📱 App Screenshot Concepts
 
 ### Main Swipe Screen
 The heart of the app where you discover new cat friends:
