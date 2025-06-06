@@ -46,7 +46,7 @@ jobs:
     - name: List build outputs for debugging
       run: |
         echo "Build outputs:"
-        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -type f -name "*.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
+        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -type f -name "*-Signed.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
         find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -name "*.app" -type d | head -10 || true
       shell: bash
 
@@ -55,7 +55,7 @@ jobs:
       run: |
         # Copy Android APK and AAB files if they exist
         if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android" ]; then
-          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.apk artifacts/ 2>/dev/null || true
+          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*-Signed.apk artifacts/ 2>/dev/null || true
           cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.aab artifacts/ 2>/dev/null || true
         fi
       shell: bash
