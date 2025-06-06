@@ -1,0 +1,6 @@
+allow_list:
+  - aka.ms
+  - google.com
+  - visualstudio.com
+  - microsoft.com
+  - apple.com
