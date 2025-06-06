@@ -3,6 +3,7 @@ name: Build .NET MAUI App
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
 
@@ -26,4 +27,4 @@ jobs:
       run: dotnet workload install maui --version 9.0.100
 
     - name: Build
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
