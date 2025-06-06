@@ -84,6 +84,18 @@ VibeSomeMauiBro/
 
 The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) that:
 - Runs on Windows and macOS with .NET 9
+- Installs MAUI workloads for multiple platforms
+- Builds the project in Release configuration with MSBuild binary logging
+- Collects and uploads build artifacts including:
+  - **MSBuild Binary Logs** (`.binlog` files) for build diagnostics
+  - **Android APK/AAB** files for distribution
+  - **Windows unpackaged apps** for sideloading
+  - **iOS IPA** files (when building on macOS)
+  - **macOS .app** bundles (when building on macOS)
+- Artifacts are saved even on build failure for debugging
+- Artifacts are retained for 30 days
+
+**Build Artifacts**: The workflow captures all relevant build outputs as GitHub Actions artifacts, making it easy to download and test builds from any commit or pull request.
 - Installs MAUI Android workloads
 - Uses conditional build configuration:
   - **Pull Requests**: Build in Debug mode (faster CI feedback)
