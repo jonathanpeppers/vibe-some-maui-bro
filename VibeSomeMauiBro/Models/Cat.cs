@@ -10,6 +10,16 @@ public class Cat
     public string? Description { get; set; }
     public bool IsLiked { get; set; }
     public DateTime? LikedAt { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Cat cat && Id == cat.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode(StringComparison.Ordinal);
+    }
 }
 
 public class CatApiResponse

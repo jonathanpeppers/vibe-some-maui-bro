@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using VibeSomeMauiBro.Models;
 
 namespace VibeSomeMauiBro.Services;
@@ -14,13 +15,15 @@ public interface ICatService
 public class CatService : ICatService
 {
     private readonly HttpClient _httpClient;
-    private readonly List<Cat> _likedCats = new();
+    private readonly HashSet<Cat> _likedCats = new();
     private readonly HashSet<string> _seenCatIds = new(StringComparer.Ordinal);
     private readonly string _likedCatsFilePath;
+    private readonly ILogger<CatService> _logger;
 
-    public CatService(HttpClient httpClient, string? customFilePath = null)
+    public CatService(HttpClient httpClient, ILogger<CatService> logger, string? customFilePath = null)
     {
         _httpClient = httpClient;
+        _logger = logger;
         
         // Configure API key if available
         var apiKey = AppContext.GetData("CAT_API_KEY") as string;
@@ -45,10 +48,9 @@ public class CatService : ICatService
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_likedCatsFilePath)!);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If directory creation fails, continue with the file path anyway
-            // The load/save operations will handle errors gracefully
+            _logger.LogWarning(ex, "Failed to create directory for liked cats storage: {DirectoryPath}", Path.GetDirectoryName(_likedCatsFilePath));
         }
         
         // Load existing liked cats
@@ -101,8 +103,7 @@ public class CatService : ICatService
         cat.IsLiked = true;
         cat.LikedAt = DateTime.Now;
         
-        // Remove if already exists (to avoid duplicates) and add
-        _likedCats.RemoveAll(c => c.Id == cat.Id);
+        // HashSet will handle duplicates automatically based on Cat.Id
         _likedCats.Add(cat);
         
         await SaveLikedCatsAsync();
@@ -113,7 +114,7 @@ public class CatService : ICatService
         cat.IsLiked = false;
         cat.LikedAt = null;
         
-        _likedCats.RemoveAll(c => c.Id == cat.Id);
+        _likedCats.RemoveWhere(c => c.Id == cat.Id);
         
         await SaveLikedCatsAsync();
     }
@@ -124,18 +125,21 @@ public class CatService : ICatService
         {
             if (File.Exists(_likedCatsFilePath))
             {
-                var json = await File.ReadAllTextAsync(_likedCatsFilePath);
-                var likedCats = JsonSerializer.Deserialize(json, CatApiJsonContext.Default.ListCat);
+                using var fileStream = new FileStream(_likedCatsFilePath, FileMode.Open, FileAccess.Read);
+                var likedCats = await JsonSerializer.DeserializeAsync(fileStream, CatApiJsonContext.Default.ListCat);
                 if (likedCats != null)
                 {
                     _likedCats.Clear();
-                    _likedCats.AddRange(likedCats);
+                    foreach (var cat in likedCats)
+                    {
+                        _likedCats.Add(cat);
+                    }
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If loading fails, start with empty collection
+            _logger.LogWarning(ex, "Failed to load liked cats from file: {FilePath}", _likedCatsFilePath);
             _likedCats.Clear();
         }
     }
@@ -144,13 +148,12 @@ public class CatService : ICatService
     {
         try
         {
-            var json = JsonSerializer.Serialize(_likedCats, CatApiJsonContext.Default.ListCat);
-            await File.WriteAllTextAsync(_likedCatsFilePath, json);
+            using var fileStream = new FileStream(_likedCatsFilePath, FileMode.Create, FileAccess.Write);
+            await JsonSerializer.SerializeAsync(fileStream, _likedCats.ToList(), CatApiJsonContext.Default.ListCat);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If saving fails, continue with in-memory data
-            // Could log this error in a real application
+            _logger.LogError(ex, "Failed to save liked cats to file: {FilePath}", _likedCatsFilePath);
         }
     }
 

@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using VibeSomeMauiBro.Models;
 using VibeSomeMauiBro.Services;
 
@@ -27,24 +29,34 @@ public class CatServiceTests : IDisposable
     private readonly HttpClient _httpClient;
     private readonly CatService _catService;
     private readonly string _tempFilePath;
+    private readonly ILogger<CatService> _logger;
 
     public CatServiceTests()
     {
         _mockMessageHandler = new MockHttpMessageHandler();
         _httpClient = new HttpClient(_mockMessageHandler);
+        _logger = NullLogger<CatService>.Instance;
         
         // Use a unique temporary file for each test to ensure isolation
         _tempFilePath = Path.Combine(Path.GetTempPath(), $"test_liked_cats_{Guid.NewGuid()}.json");
-        _catService = new CatService(_httpClient, _tempFilePath);
+        _catService = new CatService(_httpClient, _logger, _tempFilePath);
     }
 
     public void Dispose()
     {
         _httpClient.Dispose();
         // Clean up the temporary file
-        if (File.Exists(_tempFilePath))
+        try
         {
-            File.Delete(_tempFilePath);
+            if (File.Exists(_tempFilePath))
+            {
+                File.Delete(_tempFilePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the error - in a real application you would use proper logging
+            Console.WriteLine($"Failed to delete temporary test file {_tempFilePath}: {ex.Message}");
         }
     }
 
@@ -338,13 +350,13 @@ public class CatServiceTests : IDisposable
         {
             // Act - Create first service instance and like some cats
             using var httpClient1 = new HttpClient(new MockHttpMessageHandler());
-            var catService1 = new CatService(httpClient1, tempFilePath);
+            var catService1 = new CatService(httpClient1, NullLogger<CatService>.Instance, tempFilePath);
             await catService1.LikeCatAsync(cat1);
             await catService1.LikeCatAsync(cat2);
 
             // Act - Create second service instance with same file path
             using var httpClient2 = new HttpClient(new MockHttpMessageHandler());
-            var catService2 = new CatService(httpClient2, tempFilePath);
+            var catService2 = new CatService(httpClient2, NullLogger<CatService>.Instance, tempFilePath);
             var persistedCats = await catService2.GetLikedCatsAsync();
 
             // Assert
@@ -372,7 +384,7 @@ public class CatServiceTests : IDisposable
 
         // Act & Assert - Should not throw and should start with empty collection
         using var httpClient = new HttpClient(new MockHttpMessageHandler());
-        var catService = new CatService(httpClient, invalidPath);
+        var catService = new CatService(httpClient, NullLogger<CatService>.Instance, invalidPath);
         var likedCats = await catService.GetLikedCatsAsync();
 
         Assert.Empty(likedCats);
