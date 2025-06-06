@@ -1,4 +1,4 @@
-name: Build .NET MAUI App
+name: build
 
 on:
   push:
@@ -27,7 +27,12 @@ jobs:
       run: dotnet workload install maui --version 9.0.100
 
     - name: Build
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
       run: dotnet build vibe-some-maui-bro.sln --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
 
     - name: Test
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
       run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }} --no-build
+
