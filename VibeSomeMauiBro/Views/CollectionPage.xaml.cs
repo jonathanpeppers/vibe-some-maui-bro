@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using VibeSomeMauiBro.Models;
 using VibeSomeMauiBro.Services;
 
@@ -7,10 +6,10 @@ namespace VibeSomeMauiBro.Views;
 public partial class CollectionPage : ContentPage
 {
     private readonly ICatService _catService;
-    
-    private ObservableCollection<Cat> _likedCats = new();
-    public ObservableCollection<Cat> LikedCats 
-    { 
+
+    private List<Cat> _likedCats = [];
+    public List<Cat> LikedCats
+    {
         get => _likedCats;
         set 
         {
@@ -36,8 +35,7 @@ public partial class CollectionPage : ContentPage
     {
         try
         {
-            var likedCats = await _catService.GetLikedCatsAsync();
-            LikedCats = new ObservableCollection<Cat>(likedCats);
+            LikedCats = await _catService.GetLikedCatsAsync();
         }
         catch (Exception ex)
         {

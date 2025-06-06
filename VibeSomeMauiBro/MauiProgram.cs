@@ -19,7 +19,7 @@ public static class MauiProgram
 
 		// Register services
 		builder.Services.AddSingleton<HttpClient>();
-		builder.Services.AddScoped<ICatService, CatService>();
+		builder.Services.AddSingleton<ICatService, CatService>();
 		builder.Services.AddSingleton<MainPage>();
 		builder.Services.AddTransient<CollectionPage>();
 
