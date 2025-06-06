@@ -96,6 +96,10 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - Artifacts are retained for 30 days
 
 **Build Artifacts**: The workflow captures all relevant build outputs as GitHub Actions artifacts, making it easy to download and test builds from any commit or pull request.
+- Installs MAUI Android workloads
+- Uses conditional build configuration:
+  - **Pull Requests**: Build in Debug mode (faster CI feedback)
+  - **Main branch pushes, release tags**: Build in Release mode (optimized for deployment)
 
 ### Future Development
 
