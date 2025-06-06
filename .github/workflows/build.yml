@@ -39,6 +39,8 @@ jobs:
       shell: bash
 
     - name: Build
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
 
     - name: List build outputs for debugging
