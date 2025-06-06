@@ -115,9 +115,6 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Install MAUI workloads
-      run: dotnet workload install maui --version 9.0.100
-
     - name: Download build artifacts
       uses: actions/download-artifact@v4
       with:
@@ -161,8 +158,6 @@ jobs:
         sleep 5
 
     - name: Run UI Tests
-      env:
-        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
       run: dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory TestResults
 
     - name: Upload test results
