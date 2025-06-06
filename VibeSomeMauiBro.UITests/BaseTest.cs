@@ -40,13 +40,17 @@ public abstract class BaseTest : IDisposable
         }
 
         // Look for APK relative to the test project (for local testing)
-        var relativePath = Path.Combine(currentDirectory, "..", "VibeSomeMauiBro", "bin", "Debug", "net9.0-android");
-        if (Directory.Exists(relativePath))
+        var configurations = new[] { "Debug", "Release" };
+        foreach (var config in configurations)
         {
-            var apkFiles = Directory.GetFiles(relativePath, "*-Signed.apk", SearchOption.AllDirectories);
-            if (apkFiles.Length > 0)
+            var relativePath = Path.Combine(currentDirectory, "..", "VibeSomeMauiBro", "bin", config, "net9.0-android");
+            if (Directory.Exists(relativePath))
             {
-                return apkFiles[0];
+                var apkFiles = Directory.GetFiles(relativePath, "*-Signed.apk", SearchOption.AllDirectories);
+                if (apkFiles.Length > 0)
+                {
+                    return apkFiles[0];
+                }
             }
         }
 

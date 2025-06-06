@@ -5,6 +5,7 @@ namespace VibeSomeMauiBro.UITests;
 
 public class MainPageTests : BaseTest
 {
+    private const int WaitForContentLoadMs = 2000;
     [Fact]
     public void MainPage_Should_LoadCatImage()
     {
@@ -68,7 +69,7 @@ public class MainPageTests : BaseTest
         });
 
         // Wait a bit more for the cat card content to load
-        Thread.Sleep(2000);
+        Thread.Sleep(WaitForContentLoadMs);
 
         // Act & Assert - Check that "Unknown Breed" text is not displayed
         try

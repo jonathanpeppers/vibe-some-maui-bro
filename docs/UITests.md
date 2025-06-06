@@ -37,11 +37,11 @@ The UI tests are built using:
 First, build the Android APK:
 
 ```bash
-# From the repository root
+# From the repository root (use Debug or Release as needed)
 dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj -f net9.0-android --configuration Debug
 ```
 
-This will create a signed APK in `VibeSomeMauiBro/bin/Debug/net9.0-android/`.
+This will create a signed APK in `VibeSomeMauiBro/bin/Debug/net9.0-android/` (or the corresponding Release folder).
 
 ### Step 2: Start Android Emulator
 
@@ -61,8 +61,8 @@ Or use Android Studio to create and start an emulator.
 Install the APK on the emulator:
 
 ```bash
-# Find the APK file
-APK_PATH=$(find VibeSomeMauiBro/bin/Debug/net9.0-android -name "*-Signed.apk" | head -1)
+# Find the APK file (works for both Debug and Release)
+APK_PATH=$(find VibeSomeMauiBro/bin -name "*-Signed.apk" | head -1)
 
 # Install using dotnet android
 dotnet android device install --package "$APK_PATH"
@@ -86,6 +86,7 @@ Keep this running in a separate terminal.
 In another terminal, run the UI tests:
 
 ```bash
+# Use the same configuration as used for building (Debug or Release)
 dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration Debug
 ```
 
@@ -125,46 +126,6 @@ The UI tests run automatically in GitHub Actions:
 - Sets up Android emulator and Appium
 - Installs the app and runs tests
 - Uploads test results
-
-## Troubleshooting
-
-### Common Issues
-
-1. **APK not found**
-   - Ensure the Android app builds successfully
-   - Check that the APK path in BaseTest.cs is correct
-
-2. **Emulator not starting**
-   - Verify Android SDK is properly installed
-   - Ensure virtualization is enabled (for local development)
-   - Try different emulator configurations
-
-3. **Appium connection issues**
-   - Verify Appium server is running on default port (4723)
-   - Check that UiAutomator2 driver is installed
-   - Ensure Android device is visible to adb
-
-4. **Test timeouts**
-   - Increase timeout values in test code
-   - Ensure emulator has sufficient resources
-   - Check network connectivity for cat API calls
-
-### Debug Mode
-
-For detailed debugging, you can:
-
-1. Enable verbose Appium logging:
-   ```bash
-   appium server --log-level debug
-   ```
-
-2. Use adb to inspect the device:
-   ```bash
-   adb devices
-   adb logcat
-   ```
-
-3. Take screenshots during test execution (can be added to test code)
 
 ## Adding New Tests
 
