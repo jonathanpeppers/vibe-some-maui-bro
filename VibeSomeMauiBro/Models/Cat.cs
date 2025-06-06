@@ -2,8 +2,8 @@ namespace VibeSomeMauiBro.Models;
 
 public class Cat
 {
-    public string Id { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
+    public string Id { get; set; } = "";
+    public string ImageUrl { get; set; } = "";
     public string? Breed { get; set; }
     public string? Description { get; set; }
     public bool IsLiked { get; set; }
@@ -12,13 +12,13 @@ public class Cat
 
 public class CatApiResponse
 {
-    public string Id { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
+    public string Id { get; set; } = "";
+    public string Url { get; set; } = "";
     public Breed[]? Breeds { get; set; }
 }
 
 public class Breed
 {
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = "";
     public string? Description { get; set; }
 }

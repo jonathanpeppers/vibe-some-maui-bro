@@ -95,6 +95,14 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 
 **CatSwipe App Architecture (as of current version):**
 
+### Coding Standards
+
+**Code Style Guidelines:**
+- **String Literals**: Always use `""` instead of `string.Empty` for empty string initialization
+- **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
+- **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead
+- **Property Change Notifications**: Implement `INotifyPropertyChanged` for data-bound properties that can change at runtime
+
 #### Core Components Implemented:
 - **Models/Cat.cs**: Data models for cat information and API responses
 - **Services/CatService.cs**: HTTP service for fetching cat photos from The Cat API (https://thecatapi.com)
@@ -113,13 +121,13 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 
 #### Technical Patterns Used:
 - **Dependency Injection**: HttpClient and CatService registered in MauiProgram
-- **MVVM-Light**: Basic data binding for collection view
+- **Data Binding**: Basic data binding for collection view
 - **Gesture Recognition**: PanGestureRecognizer for swipe detection
 - **Async/Await**: Proper async patterns for API calls
 - **Error Handling**: Try-catch with fallback data for offline scenarios
 
 #### API Integration:
-- Uses **The Cat API** (https://api.thecatapi.com/v1/images/search)
+- Uses **The Cat API** (https://api.thecatapi.com/v1/images/search) - see [docs/CatApi.md](../docs/CatApi.md)
 - Free tier: 10 requests per minute
 - Includes breed information when available
 - Automatic fallback to local images if API fails

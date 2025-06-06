@@ -21,10 +21,10 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>CatSwipe</ApplicationTitle>
+		<ApplicationTitle>VibeSomeMauiBro</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.catswipe.vibesomemauibro</ApplicationId>
+		<ApplicationId>com.companyname.vibesomemauibro</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
