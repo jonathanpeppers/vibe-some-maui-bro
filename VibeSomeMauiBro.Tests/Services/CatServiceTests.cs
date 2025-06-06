@@ -21,17 +21,31 @@ public class MockHttpMessageHandler : HttpMessageHandler
     }
 }
 
-public class CatServiceTests
+public class CatServiceTests : IDisposable
 {
     private readonly MockHttpMessageHandler _mockMessageHandler;
     private readonly HttpClient _httpClient;
     private readonly CatService _catService;
+    private readonly string _tempFilePath;
 
     public CatServiceTests()
     {
         _mockMessageHandler = new MockHttpMessageHandler();
         _httpClient = new HttpClient(_mockMessageHandler);
-        _catService = new CatService(_httpClient);
+        
+        // Use a unique temporary file for each test to ensure isolation
+        _tempFilePath = Path.Combine(Path.GetTempPath(), $"test_liked_cats_{Guid.NewGuid()}.json");
+        _catService = new CatService(_httpClient, _tempFilePath);
+    }
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+        // Clean up the temporary file
+        if (File.Exists(_tempFilePath))
+        {
+            File.Delete(_tempFilePath);
+        }
     }
 
     private void SetupHttpResponse(string responseContent, HttpStatusCode statusCode = HttpStatusCode.OK)

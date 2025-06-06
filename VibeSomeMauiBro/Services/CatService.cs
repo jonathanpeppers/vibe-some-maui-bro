@@ -14,10 +14,11 @@ public interface ICatService
 public class CatService : ICatService
 {
     private readonly HttpClient _httpClient;
-    private readonly HashSet<Cat> _likedCats = new();
+    private readonly List<Cat> _likedCats = new();
     private readonly HashSet<string> _seenCatIds = new(StringComparer.Ordinal);
+    private readonly string _likedCatsFilePath;
 
-    public CatService(HttpClient httpClient)
+    public CatService(HttpClient httpClient, string? customFilePath = null)
     {
         _httpClient = httpClient;
         
@@ -27,6 +28,23 @@ public class CatService : ICatService
         {
             _httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
         }
+
+        // Set up file path for liked cats storage
+        if (customFilePath != null)
+        {
+            _likedCatsFilePath = customFilePath;
+        }
+        else
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            _likedCatsFilePath = Path.Combine(appDataPath, "VibeSomeMauiBro", "liked_cats.json");
+        }
+        
+        // Ensure directory exists
+        Directory.CreateDirectory(Path.GetDirectoryName(_likedCatsFilePath)!);
+        
+        // Load existing liked cats
+        LoadLikedCatsAsync().Wait();
     }
 
     public async Task<List<Cat>> GetCatsAsync(int count = 10)
@@ -70,20 +88,62 @@ public class CatService : ICatService
         return Task.FromResult(_likedCats.ToList());
     }
 
-    public Task LikeCatAsync(Cat cat)
+    public async Task LikeCatAsync(Cat cat)
     {
         cat.IsLiked = true;
         cat.LikedAt = DateTime.Now;
+        
+        // Remove if already exists (to avoid duplicates) and add
+        _likedCats.RemoveAll(c => c.Id == cat.Id);
         _likedCats.Add(cat);
-        return Task.CompletedTask;
+        
+        await SaveLikedCatsAsync();
     }
 
-    public Task DislikeCatAsync(Cat cat)
+    public async Task DislikeCatAsync(Cat cat)
     {
         cat.IsLiked = false;
         cat.LikedAt = null;
-        _likedCats.Remove(cat);
-        return Task.CompletedTask;
+        
+        _likedCats.RemoveAll(c => c.Id == cat.Id);
+        
+        await SaveLikedCatsAsync();
+    }
+
+    private async Task LoadLikedCatsAsync()
+    {
+        try
+        {
+            if (File.Exists(_likedCatsFilePath))
+            {
+                var json = await File.ReadAllTextAsync(_likedCatsFilePath);
+                var likedCats = JsonSerializer.Deserialize(json, CatApiJsonContext.Default.ListCat);
+                if (likedCats != null)
+                {
+                    _likedCats.Clear();
+                    _likedCats.AddRange(likedCats);
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // If loading fails, start with empty collection
+            _likedCats.Clear();
+        }
+    }
+
+    private async Task SaveLikedCatsAsync()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_likedCats, CatApiJsonContext.Default.ListCat);
+            await File.WriteAllTextAsync(_likedCatsFilePath, json);
+        }
+        catch (Exception)
+        {
+            // If saving fails, continue with in-memory data
+            // Could log this error in a real application
+        }
     }
 
     private static List<Cat> GetFallbackCats(int count)

@@ -26,6 +26,7 @@ public class Breed
 }
 
 [JsonSerializable(typeof(CatApiResponse[]))]
+[JsonSerializable(typeof(List<Cat>))]
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
 public partial class CatApiJsonContext : JsonSerializerContext
 {
