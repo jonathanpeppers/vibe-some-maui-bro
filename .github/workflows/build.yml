@@ -29,4 +29,10 @@ jobs:
     - name: Build
       env:
         CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
+      run: dotnet build vibe-some-maui-bro.sln --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
+
+    - name: Test
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
+      run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }} --no-build
+
