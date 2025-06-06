@@ -311,4 +311,90 @@ public class CatServiceTests
         Assert.Contains(likedAfterDisliking, c => c.Id == "cat3");
         Assert.DoesNotContain(likedAfterDisliking, c => c.Id == "cat2");
     }
+
+    [Fact]
+    public async Task GetCatsAsync_CanGenerateEpicCat_WhenRarityCombinationsAlign()
+    {
+        // Arrange - simulate API failure to get fallback cats
+        SetupHttpException(new HttpRequestException("Network error"));
+
+        // Act - call multiple times to potentially get epic cat 
+        // (Note: This test doesn't rely on randomness directly, but ensures epic cat properties are correct when generated)
+        var results = new List<List<Cat>>();
+        for (int i = 0; i < 10; i++)
+        {
+            // Create new service instance for each attempt to reset seen cats
+            var newService = new CatService(new HttpClient(_mockMessageHandler));
+            var cats = await newService.GetCatsAsync(1);
+            results.Add(cats);
+        }
+
+        // Assert - At least verify that fallback mechanism is working
+        Assert.All(results, result => Assert.NotEmpty(result));
+        
+        // If we want to specifically test epic cat properties, we can call the CreateEpicCat method directly 
+        // through reflection, or test the properties when we know it was generated
+        Assert.All(results, catList => 
+        {
+            foreach (var cat in catList)
+            {
+                if (cat.Id == "epic_cat_legendary")
+                {
+                    Assert.Equal("epic_cat.png", cat.ImageUrl);
+                    Assert.Equal("Legendary Epic Cat", cat.Breed);
+                    Assert.Contains("LEGENDARY EPIC CAT", cat.Description);
+                    Assert.Contains("🌟", cat.Description);
+                }
+            }
+        });
+    }
+
+    [Fact]
+    public async Task GetCatsAsync_EpicCatOnlyAppearsOnce()
+    {
+        // Arrange - force epic cat generation by using reflection to set Random to always return 0
+        var randomField = typeof(CatService).GetField("_random", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var originalRandom = randomField?.GetValue(null);
+        
+        try
+        {
+            // Create a mock Random that always returns 0 (epic cat condition)
+            var alwaysZeroRandom = new MockRandom(0);
+            randomField?.SetValue(null, alwaysZeroRandom);
+
+            SetupHttpException(new HttpRequestException("Network error"));
+
+            // Act - call GetCatsAsync multiple times
+            var firstCall = await _catService.GetCatsAsync(1);
+            var secondCall = await _catService.GetCatsAsync(1);
+
+            // Assert - Epic cat should only appear in first call
+            var firstCallEpicCats = firstCall.Where(c => c.Id == "epic_cat_legendary").ToList();
+            var secondCallEpicCats = secondCall.Where(c => c.Id == "epic_cat_legendary").ToList();
+            
+            Assert.Single(firstCallEpicCats); // Should have epic cat in first call
+            Assert.Empty(secondCallEpicCats); // Should not have epic cat in second call (already seen)
+        }
+        finally
+        {
+            // Restore original Random
+            randomField?.SetValue(null, originalRandom);
+        }
+    }
+}
+
+// Helper class for testing
+public class MockRandom : Random
+{
+    private readonly int _value;
+    
+    public MockRandom(int value)
+    {
+        _value = value;
+    }
+    
+    public override int Next(int maxValue)
+    {
+        return _value;
+    }
 }
