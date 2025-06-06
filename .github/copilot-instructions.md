@@ -104,6 +104,8 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - **Property Change Notifications**: Use `BindableObject.OnPropertyChanged()` for MAUI pages/views - BindableObject already implements `INotifyPropertyChanged`
 - **Collections Performance**: Use `HashSet<T>` instead of `List<T>` for membership testing and duplicate prevention
 - **JSON Serialization**: Use System.Text.Json source generators for better performance - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation)
+- **XAML Compiled Bindings**: Always use compiled bindings with `x:DataType` to improve runtime performance and enable compile-time binding validation - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/maui/fundamentals/data-binding/compiled-bindings?view=net-maui-9.0)
+- **Warnings as Errors**: Project configured to treat all warnings as errors via `Directory.Build.props` to ensure code quality
 
 #### Core Components Implemented:
 - **Models/Cat.cs**: Data models for cat information and API responses

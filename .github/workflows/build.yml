@@ -8,7 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # NOTE: macos-latest was 14
+        os: [windows-latest, macos-15]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
@@ -19,12 +23,9 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Install MAUI workloads
-      run: dotnet workload install maui-android
-
-    - name: Restore dependencies
-      run: dotnet restore VibeSomeMauiBro/VibeSomeMauiBro.csproj
+      run: dotnet workload install maui --version 9.0.100
 
     - name: Build
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --no-restore
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release
       env:
         CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
