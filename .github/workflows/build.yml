@@ -14,6 +14,8 @@ jobs:
         # NOTE: macos-latest was 14
         os: [windows-latest, macos-15]
     runs-on: ${{ matrix.os }}
+    env:
+      BUILD_CONFIGURATION: ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
 
     steps:
     - uses: actions/checkout@v4
@@ -37,22 +39,22 @@ jobs:
       shell: bash
 
     - name: Build
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
 
     - name: List build outputs for debugging
       run: |
         echo "Build outputs:"
-        find VibeSomeMauiBro/bin/Release -type f -name "*.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
-        find VibeSomeMauiBro/bin/Release -name "*.app" -type d | head -10 || true
+        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -type f -name "*.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
+        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -name "*.app" -type d | head -10 || true
       shell: bash
 
     - name: Collect Android artifacts
       if: runner.os == 'Linux' || runner.os == 'Windows' || runner.os == 'macOS'
       run: |
         # Copy Android APK and AAB files if they exist
-        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-android" ]; then
-          cp VibeSomeMauiBro/bin/Release/net9.0-android/*.apk artifacts/ 2>/dev/null || true
-          cp VibeSomeMauiBro/bin/Release/net9.0-android/*.aab artifacts/ 2>/dev/null || true
+        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android" ]; then
+          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.apk artifacts/ 2>/dev/null || true
+          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.aab artifacts/ 2>/dev/null || true
         fi
       shell: bash
 
@@ -60,8 +62,8 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         # Copy Windows unpackaged app directory if it exists
-        if (Test-Path "VibeSomeMauiBro/bin/Release/net9.0-windows*") {
-          $windowsDir = Get-ChildItem "VibeSomeMauiBro/bin/Release/net9.0-windows*" | Select-Object -First 1
+        if (Test-Path "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*") {
+          $windowsDir = Get-ChildItem "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*" | Select-Object -First 1
           if ($windowsDir) {
             Copy-Item -Path $windowsDir.FullName -Destination "artifacts/windows-app" -Recurse -Force
           }
@@ -72,12 +74,12 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         # Copy iOS artifacts if they exist (IPA, or at least the built assemblies)
-        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-ios" ]; then
-          cp VibeSomeMauiBro/bin/Release/net9.0-ios/*.ipa artifacts/ 2>/dev/null || true
+        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios" ]; then
+          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/*.ipa artifacts/ 2>/dev/null || true
           # If no IPA, copy the built assemblies for inspection
           if [ ! -f artifacts/*.ipa ]; then
             mkdir -p artifacts/ios-assemblies
-            cp VibeSomeMauiBro/bin/Release/net9.0-ios/*.dll artifacts/ios-assemblies/ 2>/dev/null || true
+            cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/*.dll artifacts/ios-assemblies/ 2>/dev/null || true
           fi
         fi
       shell: bash
@@ -86,12 +88,12 @@ jobs:
       if: runner.os == 'macOS' 
       run: |
         # Copy macOS artifacts (.app bundles or built assemblies)
-        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-maccatalyst" ]; then
-          find VibeSomeMauiBro/bin/Release/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
+        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst" ]; then
+          find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
           # If no .app bundle, copy the built assemblies for inspection  
           if [ ! -d artifacts/*.app ]; then
             mkdir -p artifacts/maccatalyst-assemblies
-            cp VibeSomeMauiBro/bin/Release/net9.0-maccatalyst/*.dll artifacts/maccatalyst-assemblies/ 2>/dev/null || true
+            cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst/*.dll artifacts/maccatalyst-assemblies/ 2>/dev/null || true
           fi
         fi
       shell: bash
