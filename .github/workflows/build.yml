@@ -25,5 +25,63 @@ jobs:
     - name: Install MAUI workloads
       run: dotnet workload install maui --version 9.0.100
 
+    - name: Create artifacts directory (Windows)
+      if: runner.os == 'Windows'
+      run: New-Item -ItemType Directory -Path "artifacts" -Force
+      shell: powershell
+
+    - name: Create artifacts directory (Unix)
+      if: runner.os != 'Windows'
+      run: mkdir -p artifacts
+      shell: bash
+
     - name: Build
-      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
+
+    - name: Collect Android artifacts
+      if: runner.os == 'Linux' || runner.os == 'Windows' || runner.os == 'macOS'
+      run: |
+        # Copy Android APK and AAB files if they exist
+        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-android" ]; then
+          cp VibeSomeMauiBro/bin/Release/net9.0-android/*.apk artifacts/ 2>/dev/null || true
+          cp VibeSomeMauiBro/bin/Release/net9.0-android/*.aab artifacts/ 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Collect Windows artifacts
+      if: runner.os == 'Windows'
+      run: |
+        # Copy Windows unpackaged app directory if it exists
+        if (Test-Path "VibeSomeMauiBro/bin/Release/net9.0-windows*") {
+          $windowsDir = Get-ChildItem "VibeSomeMauiBro/bin/Release/net9.0-windows*" | Select-Object -First 1
+          if ($windowsDir) {
+            Copy-Item -Path $windowsDir.FullName -Destination "artifacts/windows-app" -Recurse -Force
+          }
+        }
+      shell: powershell
+
+    - name: Collect iOS artifacts  
+      if: runner.os == 'macOS'
+      run: |
+        # Copy iOS IPA files if they exist
+        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-ios" ]; then
+          cp VibeSomeMauiBro/bin/Release/net9.0-ios/*.ipa artifacts/ 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Collect macOS artifacts
+      if: runner.os == 'macOS' 
+      run: |
+        # Copy macOS .app bundles if they exist
+        if [ -d "VibeSomeMauiBro/bin/Release/net9.0-maccatalyst" ]; then
+          find VibeSomeMauiBro/bin/Release/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
+        fi
+      shell: bash
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: artifacts/
+        retention-days: 30
