@@ -1,4 +1,4 @@
-name: Build .NET MAUI App
+name: build
 
 on:
   push:
@@ -42,6 +42,11 @@ jobs:
       env:
         CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
+
+    - name: Test
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
+      run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-build
 
     - name: List build outputs for debugging
       run: |
