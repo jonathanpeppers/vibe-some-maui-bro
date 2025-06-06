@@ -84,6 +84,11 @@ public partial class MainPage : ContentPage
 			BackgroundColor = Colors.White
 		};
 
+		// Add pan gesture for swipe recognition
+		var panGesture = new PanGestureRecognizer();
+		panGesture.PanUpdated += (s, e) => OnCardPanUpdated(s, e, cat);
+		contentView.GestureRecognizers.Add(panGesture);
+
 		AbsoluteLayout.SetLayoutBounds(contentView, new Rect(0.5, 0.5, 0.8, 0.7));
 		AbsoluteLayout.SetLayoutFlags(contentView, Microsoft.Maui.Layouts.AbsoluteLayoutFlags.All);
 
@@ -194,5 +199,67 @@ public partial class MainPage : ContentPage
 	private async void OnLoadMoreCatsClicked(object? sender, EventArgs e)
 	{
 		await LoadCatsAsync();
+	}
+
+	private async void OnCardPanUpdated(object? sender, PanUpdatedEventArgs e, Cat cat)
+	{
+		var card = sender as ContentView;
+		if (card == null) return;
+
+		const double threshold = 100;
+
+		switch (e.StatusType)
+		{
+			case GestureStatus.Running:
+				// Move card with gesture and add rotation for effect
+				card.TranslationX = e.TotalX;
+				card.TranslationY = e.TotalY * 0.2; // Reduce vertical movement
+				card.Rotation = e.TotalX * 0.1; // Slight rotation based on horizontal movement
+				
+				// Change opacity based on swipe distance
+				var swipeDistance = Math.Abs(e.TotalX);
+				card.Opacity = Math.Max(0.5, 1 - (swipeDistance / 200));
+				break;
+
+			case GestureStatus.Completed:
+				// Determine if swipe was significant enough
+				if (Math.Abs(e.TotalX) > threshold)
+				{
+					// Animate card off screen
+					var direction = e.TotalX > 0 ? 1 : -1;
+					await card.TranslateTo(direction * 400, e.TotalY, 250, Easing.CubicOut);
+					
+					// Process the swipe
+					if (direction > 0)
+					{
+						await _catService.LikeCatAsync(cat);
+					}
+					else
+					{
+						await _catService.DislikeCatAsync(cat);
+					}
+					
+					NextCat();
+				}
+				else
+				{
+					// Return card to original position
+					await Task.WhenAll(
+						card.TranslateTo(0, 0, 250, Easing.SpringOut),
+						card.RotateTo(0, 250, Easing.SpringOut)
+					);
+					card.Opacity = 1;
+				}
+				break;
+
+			case GestureStatus.Canceled:
+				// Return card to original position
+				await Task.WhenAll(
+					card.TranslateTo(0, 0, 250, Easing.SpringOut),
+					card.RotateTo(0, 250, Easing.SpringOut)
+				);
+				card.Opacity = 1;
+				break;
+		}
 	}
 }
