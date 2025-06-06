@@ -1,0 +1,129 @@
+name: ui-tests
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_CONFIGURATION: ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Install MAUI workloads
+      run: dotnet workload install maui --version 9.0.100
+
+    - name: Create artifacts directory
+      run: New-Item -ItemType Directory -Path "artifacts" -Force
+      shell: powershell
+
+    - name: Build
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
+      run: dotnet build vibe-some-maui-bro.sln --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
+
+    - name: Test
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
+      run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-build
+
+    - name: Collect Android artifacts
+      run: |
+        # Copy Android APK files if they exist
+        if (Test-Path "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android") {
+          Copy-Item "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*-Signed.apk" "artifacts/" -ErrorAction SilentlyContinue
+        }
+      shell: powershell
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: artifacts/
+        retention-days: 30
+
+  ui-tests:
+    runs-on: macos-13
+    needs: [build]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Install MAUI workloads
+      run: dotnet workload install maui --version 9.0.100
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts-windows-latest
+        path: artifacts/
+
+    - name: List downloaded artifacts
+      run: ls -la artifacts/
+
+    - name: Restore Tools
+      run: dotnet tool restore || echo "No tools to restore"
+
+    - name: Boot Android emulator
+      run: |
+        # Use dotnet android tool to set up emulator
+        dotnet android sdk install --package 'system-images;android-33;default;x86_64'
+        dotnet android avd create --name UITestEmu --sdk 'system-images;android-33;default;x86_64' --force
+        dotnet android avd start --name UITestEmu --wait-boot --gpu guest --no-snapshot --no-audio --no-boot-anim --no-window
+        dotnet android device list
+
+    - name: Install App
+      run: |
+        # Find and install the APK
+        APK_PATH=$(find artifacts/ -name "*-Signed.apk" | head -1)
+        if [ -n "$APK_PATH" ]; then
+          echo "Installing APK: $APK_PATH"
+          dotnet android device install --package "$APK_PATH"
+        else
+          echo "No APK found in artifacts"
+          exit 1
+        fi
+
+    - name: Install Appium
+      run: |
+        npm install -g appium
+        appium driver install uiautomator2
+
+    - name: Start Appium server
+      run: |
+        appium server --log-level info &
+        sleep 5
+
+    - name: Run UI Tests
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
+      run: dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory TestResults
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: ui-test-results
+        path: TestResults/
+        retention-days: 30

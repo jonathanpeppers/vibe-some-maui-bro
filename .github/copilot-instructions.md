@@ -109,6 +109,29 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 
 **CatSwipe App Architecture (as of current version):**
 
+### Testing
+
+**Test Projects:**
+- **VibeSomeMauiBro.Tests**: Unit tests for services and models using xUnit
+- **VibeSomeMauiBro.UITests**: UI/integration tests using Appium for Android emulator testing
+
+**Testing Commands:**
+```bash
+# Run unit tests
+dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj
+
+# Run UI tests (requires Android emulator and Appium server)
+dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj
+```
+
+**UI Test Requirements:**
+- Android emulator running (API level 29+)
+- Appium server running on port 4723
+- UiAutomator2 driver installed
+- APK built and available for testing
+
+See [docs/UITests.md](../docs/UITests.md) for detailed UI testing setup and usage instructions.
+
 ### Coding Standards
 
 **Code Style Guidelines:**
@@ -136,6 +159,7 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 - ✅ **Navigation**: Tab-based navigation between swipe and collection screens
 - ✅ **Responsive UI**: Works on Android (primary target platform)
 - ✅ **Fallback Data**: Local cat images when API is unavailable
+- ✅ **UI Testing**: Automated tests using Appium for Android emulator
 
 #### Technical Patterns Used:
 - **Dependency Injection**: HttpClient and CatService registered in MauiProgram
