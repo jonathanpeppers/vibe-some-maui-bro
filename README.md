@@ -39,12 +39,12 @@ CatSwipe is a fun, engaging mobile application that brings the addictive swiping
 ### Main Swipe Screen
 The heart of the app where you discover new cat friends:
 
-![Main Swipe Screen](docs/main-screen.png)
+<img src="docs/main-screen.png" alt="Main Swipe Screen" width="350">
 
 ### Your Matches
 View and organize all the cats you've fallen in love with:
 
-![Matches Screen](docs/matches-screen.png)
+<img src="docs/matches-screen.png" alt="Matches Screen" width="350">
 
 ## 🎨 App Concept & User Experience
 
