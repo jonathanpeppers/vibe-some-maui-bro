@@ -1,0 +1,38 @@
+name: Copilot Development Environment Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 9
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Verify .NET installation
+      run: dotnet --version
+
+    - name: Install MAUI Android workloads
+      run: dotnet workload install maui-android
+
+    - name: List installed workloads
+      run: dotnet workload list
+
+    - name: Restore project dependencies
+      run: dotnet restore VibeSomeMauiBro/VibeSomeMauiBro.csproj
+
+    - name: Build project (verification)
+      run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --no-restore
+
+    - name: Setup complete
+      run: |
+        echo "✅ Development environment setup complete!"
+        echo "📱 .NET MAUI Android development environment is ready"
+        echo "🛠️ You can now build and develop the CatSwipe application"
