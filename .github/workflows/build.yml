@@ -28,3 +28,6 @@ jobs:
 
     - name: Build
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }}
+
+    - name: Test
+      run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ github.event_name == 'pull_request' && 'Debug' || 'Release' }} --no-build
