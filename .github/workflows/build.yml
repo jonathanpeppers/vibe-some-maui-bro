@@ -26,3 +26,5 @@ jobs:
 
     - name: Build
       run: dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release --no-restore
+      env:
+        CAT_API_KEY: ${{ secrets.CAT_API_KEY }}

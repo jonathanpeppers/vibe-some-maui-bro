@@ -64,4 +64,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<RuntimeHostConfigurationOption Include="CAT_API_KEY" Value="$(CAT_API_KEY)" />
+	</ItemGroup>
+
 </Project>

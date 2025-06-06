@@ -17,7 +17,24 @@ The Cat API offers both free and paid tiers:
 - **Free Tier**: 10 requests per minute, no API key required
 - **Paid Tiers**: Higher rate limits with API key authentication
 
-CatSwipe currently uses the free tier without authentication, which is sufficient for typical user interactions.
+CatSwipe supports both modes:
+
+- **Without API Key**: Uses the free tier (10 requests/minute) 
+- **With API Key**: Uses paid tier with higher rate limits
+
+### API Key Configuration
+
+To use an API key, set the `CAT_API_KEY` environment variable:
+
+```bash
+# Local development
+export CAT_API_KEY=your_api_key_here
+
+# Or in GitHub Actions (configured as a repository secret)
+# The secret is automatically passed as an environment variable
+```
+
+The API key is automatically detected at runtime and added as an `x-api-key` header to all requests to The Cat API. If no API key is provided, the app falls back to the free tier without authentication.
 
 ## Endpoints Used
 
@@ -145,8 +162,8 @@ When The Cat API is unavailable, CatSwipe falls back to a curated list of static
 
 Potential improvements for production use:
 
-1. **API Key Integration**: Add support for paid tier with higher limits
-2. **Image Caching**: Implement persistent image caching
-3. **Favorites API**: Use The Cat API's favorites endpoint for cloud sync
-4. **Breed Filtering**: Allow users to filter by specific breeds
-5. **Vote Integration**: Implement The Cat API's voting system
+1. **Image Caching**: Implement persistent image caching
+2. **Favorites API**: Use The Cat API's favorites endpoint for cloud sync
+3. **Breed Filtering**: Allow users to filter by specific breeds
+4. **Vote Integration**: Implement The Cat API's voting system
+5. **Advanced API Features**: Support for additional Cat API endpoints like uploading user images

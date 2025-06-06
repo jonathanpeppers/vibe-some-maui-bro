@@ -20,6 +20,13 @@ public class CatService : ICatService
     public CatService(HttpClient httpClient)
     {
         _httpClient = httpClient;
+        
+        // Configure API key if available
+        var apiKey = AppContext.GetData("CAT_API_KEY") as string;
+        if (!string.IsNullOrEmpty(apiKey))
+        {
+            _httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
+        }
     }
 
     public async Task<List<Cat>> GetCatsAsync(int count = 10)
