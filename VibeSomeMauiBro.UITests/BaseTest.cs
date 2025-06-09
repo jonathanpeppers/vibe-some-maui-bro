@@ -13,7 +13,7 @@ public abstract class BaseTest : IDisposable
         
         // Basic Android capabilities
         options.AddAdditionalAppiumOption("platformName", "Android");
-        options.AddAdditionalAppiumOption("automationName", "UiAutomator2");
+        options.AutomationName = "UiAutomator2";
         options.AddAdditionalAppiumOption("app", GetAndroidAppPath());
         options.AddAdditionalAppiumOption("appium:newCommandTimeout", 300);
         options.AddAdditionalAppiumOption("appium:connectHardwareKeyboard", true);
