@@ -27,7 +27,7 @@
             
             <Button Text="💕"
                     FontSize="20"
-                    BackgroundColor="#ff4458"
+                    BackgroundColor="#4a4a4a"
                     TextColor="White"
                     CornerRadius="20"
                     WidthRequest="40"
@@ -106,7 +106,7 @@
             <Button x:Name="LikeButton"
                     Text="❤️"
                     FontSize="30"
-                    BackgroundColor="#ff4458"
+                    BackgroundColor="#4a4a4a"
                     TextColor="White"
                     CornerRadius="35"
                     WidthRequest="70"
