@@ -350,7 +350,7 @@ public class CatServiceTests : IDisposable
         for (int i = 0; i < 10; i++)
         {
             // Create new service instance for each attempt to reset seen cats
-            var newService = new CatService(new HttpClient(_mockMessageHandler));
+            var newService = new CatService(new HttpClient(_mockMessageHandler), _logger);
             var cats = await newService.GetCatsAsync(1);
             results.Add(cats);
         }
