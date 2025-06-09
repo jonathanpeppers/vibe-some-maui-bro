@@ -14,8 +14,9 @@ public abstract class BaseTest : IDisposable
         // Basic Android capabilities
         options.AddAdditionalAppiumOption("platformName", "Android");
         options.AutomationName = "UiAutomator2";
-        options.AddAdditionalAppiumOption("appPackage", "com.companyname.vibesomemauibro");
-        options.AddAdditionalAppiumOption("appActivity", "crc6430ed5f0c6edb8235.MainActivity");
+        string packageName = "com.companyname.vibesomemauibro";
+        options.AddAdditionalAppiumOption("appPackage", packageName);
+        options.AddAdditionalAppiumOption("appActivity", $"{packageName}.MainActivity");
         options.AddAdditionalAppiumOption("appium:newCommandTimeout", 300);
         options.AddAdditionalAppiumOption("appium:connectHardwareKeyboard", true);
 
