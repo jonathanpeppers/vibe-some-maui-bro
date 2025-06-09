@@ -15,7 +15,7 @@ public abstract class BaseTest : IDisposable
         options.AddAdditionalAppiumOption("platformName", "Android");
         options.AutomationName = "UiAutomator2";
         options.AddAdditionalAppiumOption("appPackage", "com.companyname.vibesomemauibro");
-        options.AddAdditionalAppiumOption("appActivity", "crc64338477404e88479c.MainActivity");
+        options.AddAdditionalAppiumOption("appActivity", "crc6430ed5f0c6edb8235.MainActivity");
         options.AddAdditionalAppiumOption("appium:newCommandTimeout", 300);
         options.AddAdditionalAppiumOption("appium:connectHardwareKeyboard", true);
 
