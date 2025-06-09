@@ -72,7 +72,7 @@ View and organize all the cats you've fallen in love with:
 - **.NET MAUI**: Cross-platform mobile development
 - **C#**: Primary programming language
 - **XAML**: UI markup
-- **SQLite**: Local data storage for user collections
+- **JSON File Storage**: Local data storage for user collections
 - **HTTP Client**: Fetching cat images from APIs
 - **Image Caching**: Smooth scrolling and offline capability
 
