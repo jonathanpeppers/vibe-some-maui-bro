@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using VibeSomeMauiBro.Models;
 using VibeSomeMauiBro.Services;
 
@@ -21,17 +23,41 @@ public class MockHttpMessageHandler : HttpMessageHandler
     }
 }
 
-public class CatServiceTests
+public class CatServiceTests : IDisposable
 {
     private readonly MockHttpMessageHandler _mockMessageHandler;
     private readonly HttpClient _httpClient;
     private readonly CatService _catService;
+    private readonly string _tempFilePath;
+    private readonly ILogger<CatService> _logger;
 
     public CatServiceTests()
     {
         _mockMessageHandler = new MockHttpMessageHandler();
         _httpClient = new HttpClient(_mockMessageHandler);
-        _catService = new CatService(_httpClient);
+        _logger = NullLogger<CatService>.Instance;
+        
+        // Use a unique temporary file for each test to ensure isolation
+        _tempFilePath = Path.Combine(Path.GetTempPath(), $"test_liked_cats_{Guid.NewGuid()}.json");
+        _catService = new CatService(_httpClient, _logger, _tempFilePath);
+    }
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+        // Clean up the temporary file
+        try
+        {
+            if (File.Exists(_tempFilePath))
+            {
+                File.Delete(_tempFilePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the error - in a real application you would use proper logging
+            Console.WriteLine($"Failed to delete temporary test file {_tempFilePath}: {ex.Message}");
+        }
     }
 
     private void SetupHttpResponse(string responseContent, HttpStatusCode statusCode = HttpStatusCode.OK)
@@ -380,6 +406,58 @@ public class CatServiceTests
             // Restore original Random
             randomField?.SetValue(null, originalRandom);
         }
+    }
+    
+    [Fact]
+    public async Task LikedCats_PersistedToFile_AndLoadedOnNewServiceInstance()
+    {
+        // Arrange
+        var tempFilePath = Path.Combine(Path.GetTempPath(), $"test_persistence_{Guid.NewGuid()}.json");
+        var cat1 = new Cat { Id = "persist1", ImageUrl = "https://example.com/persist1.jpg" };
+        var cat2 = new Cat { Id = "persist2", ImageUrl = "https://example.com/persist2.jpg" };
+
+        try
+        {
+            // Act - Create first service instance and like some cats
+            using var httpClient1 = new HttpClient(new MockHttpMessageHandler());
+            var catService1 = new CatService(httpClient1, NullLogger<CatService>.Instance, tempFilePath);
+            await catService1.LikeCatAsync(cat1);
+            await catService1.LikeCatAsync(cat2);
+
+            // Act - Create second service instance with same file path
+            using var httpClient2 = new HttpClient(new MockHttpMessageHandler());
+            var catService2 = new CatService(httpClient2, NullLogger<CatService>.Instance, tempFilePath);
+            var persistedCats = await catService2.GetLikedCatsAsync();
+
+            // Assert
+            Assert.Equal(2, persistedCats.Count);
+            Assert.Contains(persistedCats, c => c.Id == "persist1");
+            Assert.Contains(persistedCats, c => c.Id == "persist2");
+            Assert.All(persistedCats, cat => Assert.True(cat.IsLiked));
+            Assert.All(persistedCats, cat => Assert.NotNull(cat.LikedAt));
+        }
+        finally
+        {
+            // Cleanup
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task FileSystemError_DuringLoad_StartsWithEmptyCollection()
+    {
+        // Arrange - Use an invalid file path to simulate load error
+        var invalidPath = Path.Combine("/invalid/path/that/does/not/exist", "test.json");
+
+        // Act & Assert - Should not throw and should start with empty collection
+        using var httpClient = new HttpClient(new MockHttpMessageHandler());
+        var catService = new CatService(httpClient, NullLogger<CatService>.Instance, invalidPath);
+        var likedCats = await catService.GetLikedCatsAsync();
+
+        Assert.Empty(likedCats);
     }
 }
 
