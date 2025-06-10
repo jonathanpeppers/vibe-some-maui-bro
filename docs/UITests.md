@@ -165,5 +165,6 @@ public void MainPage_Should_ShowLikeButton()
 ## Resources
 
 - [Appium Documentation](http://appium.io/docs/)
+- [Appium .NET Quickstart](http://appium.io/docs/en/latest/quickstart/test-dotnet/)
 - [.NET MAUI Testing Documentation](https://learn.microsoft.com/en-us/dotnet/maui/deployment/testing)
 - [Android Testing Best Practices](https://developer.android.com/training/testing)

@@ -2,6 +2,7 @@ using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace VibeSomeMauiBro.UITests;
 
@@ -10,7 +11,7 @@ public abstract class BaseTest : IDisposable
     protected AndroidDriver Driver { get; private set; } = null!;
     
     public string PackageName { get; } = "com.companyname.vibesomemauibro";
-    public string ActivityName { get; } = "com.companyname.vibesomemauibro.MainActivity";
+    public string ActivityName { get; } = ".MainActivity";
     
     private static readonly string ArtifactsPath = GetArtifactsPath();
     
@@ -64,11 +65,15 @@ public abstract class BaseTest : IDisposable
         var serverUri = new Uri("http://127.0.0.1:4723");
         Driver = new AndroidDriver(serverUri, options);
         
-        // Activate the app to ensure it's launched
-        Driver.ActivateApp(PackageName);
+        // Configure implicit wait timeout
+        // Reference: http://appium.io/docs/en/latest/quickstart/test-dotnet/
+        Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+        
+        // Start the app activity
+        Driver.StartActivity(PackageName, ActivityName);
     }
 
-    protected void CaptureTestFailureDiagnostics(string testName)
+    protected void CaptureTestFailureDiagnostics([CallerMemberName] string testName = "")
     {
         var timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         var testArtifactDir = Path.Combine(ArtifactsPath, $"{testName}-{timestamp}");

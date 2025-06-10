@@ -14,9 +14,6 @@ public class MainPageTests : BaseTest
             // Arrange & Act
             InitializeAndroidDriver();
             
-            // Give the app a moment to fully initialize
-            Thread.Sleep(3000);
-            
             // Assert - If we get here without an exception, the app launched successfully
             Assert.NotNull(Driver);
             Assert.True(Driver.SessionId != null, "Driver should have a valid session");
@@ -27,7 +24,7 @@ public class MainPageTests : BaseTest
         }
         catch (Exception)
         {
-            CaptureTestFailureDiagnostics(nameof(App_Should_LaunchWithoutCrashing));
+            CaptureTestFailureDiagnostics();
             throw;
         }
     }
@@ -92,7 +89,7 @@ public class MainPageTests : BaseTest
         }
         catch (Exception)
         {
-            CaptureTestFailureDiagnostics(nameof(MainPage_Should_NotShowUnknownBreed));
+            CaptureTestFailureDiagnostics();
             throw;
         }
     }
