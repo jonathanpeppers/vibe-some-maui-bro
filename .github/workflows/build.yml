@@ -159,12 +159,12 @@ jobs:
         sleep 5
 
     - name: Run UI Tests
-      run: dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory VibeSomeMauiBro.UITests/test-artifacts/
+      run: dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory test-artifacts
 
     - name: Upload UI test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: ui-test-results
-        path: VibeSomeMauiBro.UITests/test-artifacts/
+        path: test-artifacts/
         retention-days: 30

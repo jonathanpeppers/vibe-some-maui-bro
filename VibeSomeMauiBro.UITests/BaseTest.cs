@@ -32,7 +32,7 @@ public abstract class BaseTest : IDisposable
         }
 
         // Navigate up from bin/Debug/net9.0/ to project root, then create test-artifacts
-        string artifactsPath = Path.Combine(assemblyDirectory, "..", "..", "..", "test-artifacts");
+        string artifactsPath = Path.Combine(assemblyDirectory, "..", "..", "..", "..", "test-artifacts");
         string fullPath = Path.GetFullPath(artifactsPath);
         
         Console.WriteLine($"Assembly location: {assemblyLocation}");
