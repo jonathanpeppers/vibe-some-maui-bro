@@ -6,6 +6,9 @@ namespace VibeSomeMauiBro.UITests;
 public abstract class BaseTest : IDisposable
 {
     protected AndroidDriver Driver { get; private set; } = null!;
+    
+    public string PackageName { get; } = "com.companyname.vibesomemauibro";
+    public string ActivityName { get; } = "com.companyname.vibesomemauibro.MainActivity";
 
     protected void InitializeAndroidDriver()
     {
@@ -14,9 +17,8 @@ public abstract class BaseTest : IDisposable
         // Basic Android capabilities
         options.AddAdditionalAppiumOption("platformName", "Android");
         options.AutomationName = "UiAutomator2";
-        string packageName = "com.companyname.vibesomemauibro";
-        options.AddAdditionalAppiumOption("appPackage", packageName);
-        options.AddAdditionalAppiumOption("appActivity", $"{packageName}.MainActivity");
+        options.AddAdditionalAppiumOption("appPackage", PackageName);
+        options.AddAdditionalAppiumOption("appActivity", ActivityName);
         options.AddAdditionalAppiumOption("appium:newCommandTimeout", 300);
         options.AddAdditionalAppiumOption("appium:connectHardwareKeyboard", true);
 

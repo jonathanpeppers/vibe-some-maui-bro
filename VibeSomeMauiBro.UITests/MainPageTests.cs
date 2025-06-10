@@ -19,9 +19,9 @@ public class MainPageTests : BaseTest
         Assert.NotNull(Driver);
         Assert.True(Driver.SessionId != null, "Driver should have a valid session");
         
-        // Verify the driver is responsive by getting the current activity
+        // Verify the driver is responsive and the current activity matches expected
         var currentActivity = Driver.CurrentActivity;
-        Assert.NotNull(currentActivity);
+        Assert.Equal(ActivityName, currentActivity);
     }
 
     [Fact]
