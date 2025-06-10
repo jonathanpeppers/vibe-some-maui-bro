@@ -20,6 +20,10 @@ public class MainPageTests : BaseTest
             // Assert - If we get here without an exception, the app launched successfully
             Assert.NotNull(Driver);
             Assert.True(Driver.SessionId != null, "Driver should have a valid session");
+            
+            // Verify the driver is responsive and the current activity matches expected
+            var currentActivity = Driver.CurrentActivity;
+            Assert.Equal(ActivityName, currentActivity);
         }
         catch (Exception)
         {
