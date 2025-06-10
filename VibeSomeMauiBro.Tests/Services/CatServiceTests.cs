@@ -387,13 +387,13 @@ public class CatServiceTests : IDisposable
         // Act - call GetCatsAsync multiple times to increase chance of hitting epic cat
         var allCats = new List<Cat>();
         var epicCatAppearances = 0;
-        
+
         // Call many times to have a reasonable chance of hitting the 1/1000 epic cat condition
         for (int i = 0; i < 100; i++)
         {
             var cats = await _catService.GetCatsAsync(1);
             allCats.AddRange(cats);
-            
+
             // Count epic cat appearances
             var epicCatsInThisBatch = cats.Where(c => c.Id == "epic_cat_legendary").ToList();
             epicCatAppearances += epicCatsInThisBatch.Count;
@@ -402,7 +402,7 @@ public class CatServiceTests : IDisposable
         // Assert - Epic cat should appear at most once across all calls
         // (due to _seenCatIds tracking, even if random condition is met multiple times)
         Assert.True(epicCatAppearances <= 1, $"Epic cat appeared {epicCatAppearances} times, but should appear at most once");
-        
+
         // If epic cat appeared, verify its properties
         var epicCat = allCats.FirstOrDefault(c => c.Id == "epic_cat_legendary");
         if (epicCat != null)
