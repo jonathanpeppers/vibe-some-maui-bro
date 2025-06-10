@@ -63,6 +63,9 @@ public abstract class BaseTest : IDisposable
         // Create driver with default Appium server URL
         var serverUri = new Uri("http://127.0.0.1:4723");
         Driver = new AndroidDriver(serverUri, options);
+        
+        // Activate the app to ensure it's launched
+        Driver.ActivateApp(PackageName);
     }
 
     protected void CaptureTestFailureDiagnostics(string testName)
