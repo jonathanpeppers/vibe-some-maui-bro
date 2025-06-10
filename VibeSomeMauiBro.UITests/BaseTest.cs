@@ -1,6 +1,7 @@
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace VibeSomeMauiBro.UITests;
 
@@ -11,12 +12,40 @@ public abstract class BaseTest : IDisposable
     public string PackageName { get; } = "com.companyname.vibesomemauibro";
     public string ActivityName { get; } = "com.companyname.vibesomemauibro.MainActivity";
     
-    private static readonly string ArtifactsPath = Path.Combine(Environment.CurrentDirectory, "test-artifacts");
+    private static readonly string ArtifactsPath = GetArtifactsPath();
+    
+    private static string GetArtifactsPath()
+    {
+        string? assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        if (string.IsNullOrEmpty(assemblyLocation))
+        {
+            Console.WriteLine("Warning: Assembly location is null or empty, falling back to current directory");
+            return Path.Combine(Environment.CurrentDirectory, "test-artifacts");
+        }
+
+        string? assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
+        if (string.IsNullOrEmpty(assemblyDirectory))
+        {
+            Console.WriteLine("Warning: Assembly directory is null or empty, falling back to current directory");
+            return Path.Combine(Environment.CurrentDirectory, "test-artifacts");
+        }
+
+        // Navigate up from bin/Debug/net9.0/ to project root, then create test-artifacts
+        string artifactsPath = Path.Combine(assemblyDirectory, "..", "..", "..", "test-artifacts");
+        string fullPath = Path.GetFullPath(artifactsPath);
+        
+        Console.WriteLine($"Assembly location: {assemblyLocation}");
+        Console.WriteLine($"Assembly directory: {assemblyDirectory}");
+        Console.WriteLine($"Artifacts path: {fullPath}");
+        
+        return fullPath;
+    }
     
     static BaseTest()
     {
         // Ensure artifacts directory exists
         Directory.CreateDirectory(ArtifactsPath);
+        Console.WriteLine($"Created artifacts directory: {ArtifactsPath}");
     }
 
     protected void InitializeAndroidDriver()
