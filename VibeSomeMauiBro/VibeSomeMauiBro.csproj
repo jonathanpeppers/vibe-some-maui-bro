@@ -52,7 +52,6 @@
 	<!-- Android CI configuration -->
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' and '$(GITHUB_ACTIONS)' == 'true'">
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-		<RuntimeIdentifier>android-x64</RuntimeIdentifier>
 	</PropertyGroup>
 
 	<ItemGroup>
