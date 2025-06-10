@@ -1,5 +1,7 @@
 using System.Text.Json;
+
 using Microsoft.Extensions.Logging;
+
 using VibeSomeMauiBro.Models;
 
 namespace VibeSomeMauiBro.Services;
@@ -17,7 +19,7 @@ public class CatService : ICatService
     private readonly HttpClient _httpClient;
     private readonly HashSet<Cat> _likedCats = new();
     private readonly HashSet<string> _seenCatIds = new(StringComparer.Ordinal);
-    private static Random _random = new();
+    private static readonly Random _random = new();
     private readonly string _likedCatsFilePath;
     private readonly ILogger<CatService> _logger;
 
@@ -25,7 +27,7 @@ public class CatService : ICatService
     {
         _httpClient = httpClient;
         _logger = logger;
-        
+
         // Configure API key if available
         var apiKey = AppContext.GetData("CAT_API_KEY") as string;
         if (!string.IsNullOrEmpty(apiKey))
@@ -43,7 +45,7 @@ public class CatService : ICatService
             var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             _likedCatsFilePath = Path.Combine(appDataPath, "VibeSomeMauiBro", "liked_cats.json");
         }
-        
+
         // Ensure directory exists
         try
         {
@@ -53,7 +55,7 @@ public class CatService : ICatService
         {
             _logger.LogWarning(ex, "Failed to create directory for liked cats storage: {DirectoryPath}", Path.GetDirectoryName(_likedCatsFilePath));
         }
-        
+
         // Load existing liked cats
         LoadLikedCatsAsync().Wait();
     }
@@ -99,7 +101,7 @@ public class CatService : ICatService
         {
             // Return fallback data if API fails
             var fallbackCats = GetFallbackCats(count);
-            
+
             // 1 in 1000 chance for epic cat (only if we haven't seen it before)
             if (_random.Next(1000) == 0 && !_seenCatIds.Contains("epic_cat_legendary"))
             {
@@ -107,7 +109,7 @@ public class CatService : ICatService
                 fallbackCats.Insert(0, epicCat); // Add at the beginning for immediate visibility
                 _seenCatIds.Add(epicCat.Id);
             }
-            
+
             return fallbackCats;
         }
     }
@@ -121,10 +123,10 @@ public class CatService : ICatService
     {
         cat.IsLiked = true;
         cat.LikedAt = DateTime.Now;
-        
+
         // HashSet will handle duplicates automatically based on Cat.Id
         _likedCats.Add(cat);
-        
+
         await SaveLikedCatsAsync();
     }
 
@@ -132,9 +134,9 @@ public class CatService : ICatService
     {
         cat.IsLiked = false;
         cat.LikedAt = null;
-        
+
         _likedCats.RemoveWhere(c => c.Id == cat.Id);
-        
+
         await SaveLikedCatsAsync();
     }
 

@@ -11,7 +11,7 @@ public partial class CollectionPage : ContentPage
     public List<Cat> LikedCats
     {
         get => _likedCats;
-        set 
+        set
         {
             _likedCats = value;
             OnPropertyChanged();
