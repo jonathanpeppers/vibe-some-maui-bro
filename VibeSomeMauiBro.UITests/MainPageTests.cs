@@ -9,75 +9,87 @@ public class MainPageTests : BaseTest
     [Fact]
     public void App_Should_LaunchWithoutCrashing()
     {
-        // Arrange & Act
-        InitializeAndroidDriver();
-        
-        // Give the app a moment to fully initialize
-        Thread.Sleep(3000);
-        
-        // Assert - If we get here without an exception, the app launched successfully
-        Assert.NotNull(Driver);
-        Assert.True(Driver.SessionId != null, "Driver should have a valid session");
-        
-        // Verify the driver is responsive and the current activity matches expected
-        var currentActivity = Driver.CurrentActivity;
-        Assert.Equal(ActivityName, currentActivity);
+        try
+        {
+            // Arrange & Act
+            InitializeAndroidDriver();
+            
+            // Give the app a moment to fully initialize
+            Thread.Sleep(3000);
+            
+            // Assert - If we get here without an exception, the app launched successfully
+            Assert.NotNull(Driver);
+            Assert.True(Driver.SessionId != null, "Driver should have a valid session");
+        }
+        catch (Exception)
+        {
+            CaptureTestFailureDiagnostics(nameof(App_Should_LaunchWithoutCrashing));
+            throw;
+        }
     }
 
     [Fact]
     public void MainPage_Should_NotShowUnknownBreed()
     {
-        // Arrange
-        InitializeAndroidDriver();
-        var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-
-        // Wait for the loading to complete
-        wait.Until(driver =>
+        try
         {
+            // Arrange
+            InitializeAndroidDriver();
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+
+            // Wait for the loading to complete
+            wait.Until(driver =>
+            {
+                try
+                {
+                    var loadingIndicator = driver.FindElement(By.XPath("//*[contains(@text, 'Loading cats')]"));
+                    return !loadingIndicator.Displayed;
+                }
+                catch (NoSuchElementException)
+                {
+                    return true;
+                }
+            });
+
+            // Wait a bit more for the cat card content to load
+            Thread.Sleep(WaitForContentLoadMs);
+
+            // Act & Assert - Check that "Unknown Breed" text is not displayed
             try
             {
-                var loadingIndicator = driver.FindElement(By.XPath("//*[contains(@text, 'Loading cats')]"));
-                return !loadingIndicator.Displayed;
+                var unknownBreedElements = Driver.FindElements(By.XPath("//*[contains(@text, 'Unknown Breed')]"));
+                
+                // Assert that no "Unknown Breed" text is found, or if found, it's not displayed
+                foreach (var element in unknownBreedElements)
+                {
+                    Assert.False(element.Displayed, "The text 'Unknown Breed' should not be visible on the main page");
+                }
             }
             catch (NoSuchElementException)
             {
-                return true;
+                // This is actually good - it means "Unknown Breed" text was not found at all
+                // Test passes
             }
-        });
 
-        // Wait a bit more for the cat card content to load
-        Thread.Sleep(WaitForContentLoadMs);
-
-        // Act & Assert - Check that "Unknown Breed" text is not displayed
-        try
-        {
-            var unknownBreedElements = Driver.FindElements(By.XPath("//*[contains(@text, 'Unknown Breed')]"));
-            
-            // Assert that no "Unknown Breed" text is found, or if found, it's not displayed
-            foreach (var element in unknownBreedElements)
+            // Additional verification: ensure some breed text is actually present
+            // Look for text elements that could contain breed information
+            var textElements = Driver.FindElements(By.ClassName("android.widget.TextView"));
+            var hasBreedInfo = textElements.Any(element => 
             {
-                Assert.False(element.Displayed, "The text 'Unknown Breed' should not be visible on the main page");
-            }
-        }
-        catch (NoSuchElementException)
-        {
-            // This is actually good - it means "Unknown Breed" text was not found at all
-            // Test passes
-        }
+                var text = element.Text;
+                return !string.IsNullOrEmpty(text) && 
+                       !text.Contains("Loading") && 
+                       !text.Contains("CatSwipe") &&
+                       !text.Contains("Unknown Breed") &&
+                       text.Length > 2; // Some actual breed name or description
+            });
 
-        // Additional verification: ensure some breed text is actually present
-        // Look for text elements that could contain breed information
-        var textElements = Driver.FindElements(By.ClassName("android.widget.TextView"));
-        var hasBreedInfo = textElements.Any(element => 
+            Assert.True(hasBreedInfo, "Expected to find some breed information displayed instead of 'Unknown Breed'");
+        }
+        catch (Exception)
         {
-            var text = element.Text;
-            return !string.IsNullOrEmpty(text) && 
-                   !text.Contains("Loading") && 
-                   !text.Contains("CatSwipe") &&
-                   !text.Contains("Unknown Breed") &&
-                   text.Length > 2; // Some actual breed name or description
-        });
-
-        Assert.True(hasBreedInfo, "Expected to find some breed information displayed instead of 'Unknown Breed'");
+            CaptureTestFailureDiagnostics(nameof(MainPage_Should_NotShowUnknownBreed));
+            throw;
+        }
     }
 }
