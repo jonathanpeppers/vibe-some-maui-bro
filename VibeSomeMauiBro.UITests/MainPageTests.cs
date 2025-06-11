@@ -13,11 +13,11 @@ public class MainPageTests : BaseTest
         {
             // Arrange & Act
             InitializeAndroidDriver();
-            
+
             // Assert - If we get here without an exception, the app launched successfully
             Assert.NotNull(Driver);
             Assert.True(Driver.SessionId != null, "Driver should have a valid session");
-            
+
             // Verify the driver is responsive and the current activity matches expected
             var currentActivity = Driver.CurrentActivity;
             Assert.Equal(ActivityName, currentActivity);
@@ -59,7 +59,7 @@ public class MainPageTests : BaseTest
             try
             {
                 var unknownBreedElements = Driver.FindElements(By.XPath("//*[contains(@text, 'Unknown Breed')]"));
-                
+
                 // Assert that no "Unknown Breed" text is found, or if found, it's not displayed
                 foreach (var element in unknownBreedElements)
                 {
@@ -75,11 +75,11 @@ public class MainPageTests : BaseTest
             // Additional verification: ensure some breed text is actually present
             // Look for text elements that could contain breed information
             var textElements = Driver.FindElements(By.ClassName("android.widget.TextView"));
-            var hasBreedInfo = textElements.Any(element => 
+            var hasBreedInfo = textElements.Any(element =>
             {
                 var text = element.Text;
-                return !string.IsNullOrEmpty(text) && 
-                       !text.Contains("Loading") && 
+                return !string.IsNullOrEmpty(text) &&
+                       !text.Contains("Loading") &&
                        !text.Contains("CatSwipe") &&
                        !text.Contains("Unknown Breed") &&
                        text.Length > 2; // Some actual breed name or description

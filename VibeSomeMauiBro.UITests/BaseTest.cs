@@ -1,20 +1,21 @@
-using OpenQA.Selenium.Appium;
-using OpenQA.Selenium.Appium.Android;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Android;
 
 namespace VibeSomeMauiBro.UITests;
 
 public abstract class BaseTest : IDisposable
 {
     protected AndroidDriver Driver { get; private set; } = null!;
-    
+
     public string PackageName { get; } = "com.companyname.vibesomemauibro";
     public string ActivityName { get; } = ".MainActivity";
-    
+
     private static readonly string ArtifactsPath = GetArtifactsPath();
-    
+
     private static string GetArtifactsPath()
     {
         string? assemblyLocation = Assembly.GetExecutingAssembly().Location;
@@ -34,14 +35,14 @@ public abstract class BaseTest : IDisposable
         // Navigate up from bin/Debug/net9.0/ to project root, then create test-artifacts
         string artifactsPath = Path.Combine(assemblyDirectory, "..", "..", "..", "..", "test-artifacts");
         string fullPath = Path.GetFullPath(artifactsPath);
-        
+
         Console.WriteLine($"Assembly location: {assemblyLocation}");
         Console.WriteLine($"Assembly directory: {assemblyDirectory}");
         Console.WriteLine($"Artifacts path: {fullPath}");
-        
+
         return fullPath;
     }
-    
+
     static BaseTest()
     {
         // Ensure artifacts directory exists
@@ -52,7 +53,7 @@ public abstract class BaseTest : IDisposable
     protected void InitializeAndroidDriver()
     {
         var options = new AppiumOptions();
-        
+
         // Basic Android capabilities
         options.AddAdditionalAppiumOption("platformName", "Android");
         options.AutomationName = "UiAutomator2";
@@ -64,11 +65,11 @@ public abstract class BaseTest : IDisposable
         // Create driver with default Appium server URL
         var serverUri = new Uri("http://127.0.0.1:4723");
         Driver = new AndroidDriver(serverUri, options);
-        
+
         // Configure implicit wait timeout
         // Reference: http://appium.io/docs/en/latest/quickstart/test-dotnet/
         Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-        
+
         // Start the app activity
         Driver.StartActivity(PackageName, ActivityName);
     }
@@ -78,12 +79,12 @@ public abstract class BaseTest : IDisposable
         var timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         var testArtifactDir = Path.Combine(ArtifactsPath, $"{testName}-{timestamp}");
         Directory.CreateDirectory(testArtifactDir);
-        
+
         try
         {
             // Capture screenshot
             CaptureScreenshot(testArtifactDir, testName);
-            
+
             // Capture logcat output
             CaptureLogcat(testArtifactDir, testName);
         }
@@ -92,7 +93,7 @@ public abstract class BaseTest : IDisposable
             Console.WriteLine($"Failed to capture diagnostics for test {testName}: {ex.Message}");
         }
     }
-    
+
     private void CaptureScreenshot(string artifactDir, string testName)
     {
         try
@@ -110,13 +111,13 @@ public abstract class BaseTest : IDisposable
             Console.WriteLine($"Failed to capture screenshot: {ex.Message}");
         }
     }
-    
+
     private void CaptureLogcat(string artifactDir, string testName)
     {
         try
         {
             var logcatPath = Path.Combine(artifactDir, $"{testName}-logcat.txt");
-            
+
             // Run adb logcat command to capture recent logs
             var processStartInfo = new ProcessStartInfo
             {
@@ -127,14 +128,14 @@ public abstract class BaseTest : IDisposable
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            
+
             using var process = Process.Start(processStartInfo);
             if (process != null)
             {
                 var output = process.StandardOutput.ReadToEnd();
                 var error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
-                
+
                 if (process.ExitCode == 0)
                 {
                     File.WriteAllText(logcatPath, output);
@@ -151,7 +152,7 @@ public abstract class BaseTest : IDisposable
             Console.WriteLine($"Failed to capture logcat: {ex.Message}");
         }
     }
-    
+
     public void Dispose()
     {
         Driver?.Quit();
