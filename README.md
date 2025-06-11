@@ -1,6 +1,8 @@
-# 🐱 CatSwipe - Vibe Some MAUI Bro
+# 🐱 CatSwipe
 
 **A .NET MAUI app that's like Tinder, but for discovering and collecting adorable cat photos from around the internet!**
+
+This repo I was able to get GitHub Copilot to write from scratch, just by filing issues and creating `copilot-instructions.md`.
 
 ## 🎯 What is CatSwipe?
 
