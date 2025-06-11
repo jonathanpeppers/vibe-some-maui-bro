@@ -29,6 +29,9 @@ jobs:
     - name: Install MAUI workloads
       run: dotnet workload install maui --version 9.0.100
 
+    - name: Verify code formatting
+      run: dotnet format vibe-some-maui-bro.sln --verify-no-changes --verbosity normal
+
     - name: Create artifacts directory (Windows)
       if: runner.os == 'Windows'
       run: New-Item -ItemType Directory -Path "artifacts" -Force
