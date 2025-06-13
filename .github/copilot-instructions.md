@@ -140,7 +140,7 @@ See [docs/UITests.md](../docs/UITests.md) for detailed UI testing setup and usag
 ### Coding Standards
 
 **Code Style Guidelines:**
-- **Code Formatting**: Always run `dotnet format vibe-some-maui-bro.sln` before committing changes to maintain consistent code style across the codebase
+- **Code Formatting**: Always run `dotnet format cat-swipe.sln` before committing changes to maintain consistent code style across the codebase
 - **String Literals**: Always use `""` instead of `string.Empty` for empty string initialization
 - **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
 - **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead

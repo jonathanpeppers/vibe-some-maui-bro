@@ -30,7 +30,7 @@ jobs:
       run: dotnet workload install maui --version 9.0.100
 
     - name: Verify code formatting
-      run: dotnet format vibe-some-maui-bro.sln --verify-no-changes --verbosity normal
+      run: dotnet format cat-swipe.sln --verify-no-changes --verbosity normal
 
     - name: Create artifacts directory (Windows)
       if: runner.os == 'Windows'
@@ -45,7 +45,7 @@ jobs:
     - name: Build
       env:
         CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
-      run: dotnet build vibe-some-maui-bro.sln --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
+      run: dotnet build cat-swipe.sln --configuration ${{ env.BUILD_CONFIGURATION }} --verbosity normal -bl:artifacts/build-${{ matrix.os }}.binlog
 
     - name: Test
       env:
