@@ -25,7 +25,7 @@
                    VerticalOptions="Center"
                    HorizontalOptions="StartAndExpand" />
             
-            <Button Text="💕"
+            <Button Text="❤️"
                     FontSize="20"
                     BackgroundColor="#4a4a4a"
                     TextColor="White"
