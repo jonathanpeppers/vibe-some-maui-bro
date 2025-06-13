@@ -57,11 +57,7 @@
                                 <Image Grid.Row="0"
                                        Source="{Binding ImageUrl}"
                                        Aspect="AspectFill"
-                                       BackgroundColor="#f0f0f0">
-                                    <Image.Clip>
-                                        <RoundRectangleGeometry CornerRadius="10" />
-                                    </Image.Clip>
-                                </Image>
+                                       BackgroundColor="#f0f0f0" />
                                 
                                 <!-- Cat Info -->
                                 <StackLayout Grid.Row="1" 
