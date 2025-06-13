@@ -50,22 +50,22 @@ jobs:
     - name: Test
       env:
         CAT_API_KEY: ${{ secrets.CAT_API_KEY }}
-      run: dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-build
+      run: dotnet test CatSwipe.Tests/CatSwipe.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --no-build
 
     - name: List build outputs for debugging
       run: |
         echo "Build outputs:"
-        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -type f -name "*-Signed.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
-        find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }} -name "*.app" -type d | head -10 || true
+        find CatSwipe/bin/${{ env.BUILD_CONFIGURATION }} -type f -name "*-Signed.apk" -o -name "*.aab" -o -name "*.ipa" -o -name "*.exe" -o -name "*.dll" | head -20 || true
+        find CatSwipe/bin/${{ env.BUILD_CONFIGURATION }} -name "*.app" -type d | head -10 || true
       shell: bash
 
     - name: Collect Android artifacts
       if: runner.os == 'Linux' || runner.os == 'Windows' || runner.os == 'macOS'
       run: |
         # Copy Android APK and AAB files if they exist
-        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android" ]; then
-          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*-Signed.apk artifacts/ 2>/dev/null || true
-          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.aab artifacts/ 2>/dev/null || true
+        if [ -d "CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android" ]; then
+          cp CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*-Signed.apk artifacts/ 2>/dev/null || true
+          cp CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-android/*.aab artifacts/ 2>/dev/null || true
         fi
       shell: bash
 
@@ -73,8 +73,8 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         # Copy Windows unpackaged app directory if it exists
-        if (Test-Path "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*") {
-          $windowsDir = Get-ChildItem "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*" | Select-Object -First 1
+        if (Test-Path "CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*") {
+          $windowsDir = Get-ChildItem "CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-windows*" | Select-Object -First 1
           if ($windowsDir) {
             Copy-Item -Path $windowsDir.FullName -Destination "artifacts/windows-app" -Recurse -Force
           }
@@ -85,8 +85,8 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         # Copy iOS artifacts if they exist (IPA)
-        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/ios-arm64" ]; then
-          cp VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/ios-arm64/*.ipa artifacts/ 2>/dev/null || true
+        if [ -d "CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/ios-arm64" ]; then
+          cp CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-ios/ios-arm64/*.ipa artifacts/ 2>/dev/null || true
         fi
       shell: bash
 
@@ -94,8 +94,8 @@ jobs:
       if: runner.os == 'macOS' 
       run: |
         # Copy macOS artifacts (.app bundles)
-        if [ -d "VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst" ]; then
-          find VibeSomeMauiBro/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
+        if [ -d "CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst" ]; then
+          find CatSwipe/bin/${{ env.BUILD_CONFIGURATION }}/net9.0-maccatalyst -name "*.app" -type d -exec cp -R {} artifacts/ \; 2>/dev/null || true
         fi
       shell: bash
 
@@ -162,7 +162,7 @@ jobs:
         sleep 5
 
     - name: Run UI Tests
-      run: dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory test-artifacts
+      run: dotnet test CatSwipe.UITests/CatSwipe.UITests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --logger trx --results-directory test-artifacts
 
     - name: Upload UI test results
       uses: actions/upload-artifact@v4
