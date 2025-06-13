@@ -35,12 +35,12 @@ CatSwipe is a .NET MAUI cross-platform mobile application that allows users to s
 ### Project Structure
 
 ```
-VibeSomeMauiBro/
+CatSwipe/
 ├── App.xaml & App.xaml.cs          # Application entry point
 ├── AppShell.xaml & AppShell.xaml.cs # Shell navigation structure
 ├── MainPage.xaml & MainPage.xaml.cs # Main app page
 ├── MauiProgram.cs                   # MAUI app configuration
-├── VibeSomeMauiBro.csproj          # Project file with dependencies
+├── CatSwipe.csproj          # Project file with dependencies
 ├── Platforms/                       # Platform-specific code
 │   ├── Android/                     # Android platform files
 │   ├── iOS/                         # iOS platform files (if enabled)
@@ -59,22 +59,22 @@ VibeSomeMauiBro/
 
 1. **Restore Dependencies**
    ```bash
-   dotnet restore VibeSomeMauiBro/VibeSomeMauiBro.csproj
+   dotnet restore CatSwipe/CatSwipe.csproj
    ```
 
 2. **Format Code** (always run before pushing changes)
    ```bash
-   dotnet format vibe-some-maui-bro.sln
+   dotnet format cat-swipe.sln
    ```
 
 3. **Build the Project**
    ```bash
-   dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj --configuration Release
+   dotnet build CatSwipe/CatSwipe.csproj --configuration Release
    ```
 
 4. **Run on Android Emulator** (if available)
    ```bash
-   dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj -t:Run -f net9.0-android
+   dotnet build CatSwipe/CatSwipe.csproj -t:Run -f net9.0-android
    ```
 
 ### Key Development Notes
@@ -117,16 +117,16 @@ The project includes a GitHub Actions workflow (`.github/workflows/build.yml`) t
 ### Testing
 
 **Test Projects:**
-- **VibeSomeMauiBro.Tests**: Unit tests for services and models using xUnit
-- **VibeSomeMauiBro.UITests**: UI/integration tests using Appium for Android emulator testing
+- **CatSwipe.Tests**: Unit tests for services and models using xUnit
+- **CatSwipe.UITests**: UI/integration tests using Appium for Android emulator testing
 
 **Testing Commands:**
 ```bash
 # Run unit tests
-dotnet test VibeSomeMauiBro.Tests/VibeSomeMauiBro.Tests.csproj
+dotnet test CatSwipe.Tests/CatSwipe.Tests.csproj
 
 # Run UI tests (requires Android emulator and Appium server)
-dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj
+dotnet test CatSwipe.UITests/CatSwipe.UITests.csproj
 ```
 
 **UI Test Requirements:**
@@ -140,7 +140,7 @@ See [docs/UITests.md](../docs/UITests.md) for detailed UI testing setup and usag
 ### Coding Standards
 
 **Code Style Guidelines:**
-- **Code Formatting**: Always run `dotnet format vibe-some-maui-bro.sln` before committing changes to maintain consistent code style across the codebase
+- **Code Formatting**: Always run `dotnet format cat-swipe.sln` before committing changes to maintain consistent code style across the codebase
 - **String Literals**: Always use `""` instead of `string.Empty` for empty string initialization
 - **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
 - **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead

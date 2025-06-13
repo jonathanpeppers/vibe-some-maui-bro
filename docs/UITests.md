@@ -38,10 +38,10 @@ First, build the Android APK:
 
 ```bash
 # From the repository root (use Debug or Release as needed)
-dotnet build VibeSomeMauiBro/VibeSomeMauiBro.csproj -f net9.0-android --configuration Debug
+dotnet build CatSwipe/CatSwipe.csproj -f net9.0-android --configuration Debug
 ```
 
-This will create a signed APK in `VibeSomeMauiBro/bin/Debug/net9.0-android/` (or the corresponding Release folder).
+This will create a signed APK in `CatSwipe/bin/Debug/net9.0-android/` (or the corresponding Release folder).
 
 ### Step 2: Start Android Emulator
 
@@ -62,7 +62,7 @@ Install the APK on the emulator:
 
 ```bash
 # Find the APK file (works for both Debug and Release)
-APK_PATH=$(find VibeSomeMauiBro/bin -name "*-Signed.apk" | head -1)
+APK_PATH=$(find CatSwipe/bin -name "*-Signed.apk" | head -1)
 
 # Install using dotnet android
 dotnet android device install --package "$APK_PATH"
@@ -87,7 +87,7 @@ In another terminal, run the UI tests:
 
 ```bash
 # Use the same configuration as used for building (Debug or Release)
-dotnet test VibeSomeMauiBro.UITests/VibeSomeMauiBro.UITests.csproj --configuration Debug
+dotnet test CatSwipe.UITests/CatSwipe.UITests.csproj --configuration Debug
 ```
 
 ## Test Structure
