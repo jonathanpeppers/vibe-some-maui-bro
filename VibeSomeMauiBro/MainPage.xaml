@@ -18,14 +18,14 @@
                      Orientation="Horizontal" 
                      HorizontalOptions="FillAndExpand"
                      Padding="20">
-            <Label Text="❤️ CatSwipe" 
+            <Label Text="🐱 CatSwipe" 
                    FontSize="24" 
                    FontAttributes="Bold"
                    TextColor="White"
                    VerticalOptions="Center"
                    HorizontalOptions="StartAndExpand" />
             
-            <Button Text="💕"
+            <Button Text="❤️"
                     FontSize="20"
                     BackgroundColor="#4a4a4a"
                     TextColor="White"
