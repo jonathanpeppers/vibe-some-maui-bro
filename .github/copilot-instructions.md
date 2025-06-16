@@ -143,7 +143,7 @@ See [docs/UITests.md](../docs/UITests.md) for detailed UI testing setup and usag
 - **Code Formatting**: Always run `dotnet format cat-swipe.sln` before committing changes to maintain consistent code style across the codebase
 - **String Literals**: Always use `""` instead of `string.Empty` for empty string initialization
 - **Primary Constructors**: Use C# primary constructors for dependency injection where appropriate (C# 12+ feature)
-- **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead
+- **Minimal Diffs**: Keep code changes as small as possible - avoid whitespace-only modifications to reduce review overhead. **Always make the smallest possible diff** - change only the specific lines needed to fix the issue, never modify unrelated files or make formatting-only changes
 - **Property Change Notifications**: Use `BindableObject.OnPropertyChanged()` for MAUI pages/views - BindableObject already implements `INotifyPropertyChanged`
 - **Collections Performance**: Use `HashSet<T>` instead of `List<T>` for membership testing and duplicate prevention - convert to `List<T>` only when needed for serialization
 - **JSON Serialization**: Use System.Text.Json source generators for better performance - see [Microsoft docs](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation)
