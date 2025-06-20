@@ -18,6 +18,12 @@ jobs:
     - name: Verify .NET installation
       run: dotnet --version
 
+    - name: Restore Tools
+      run: dotnet tool restore || echo "No tools to restore"
+
+    - name: Enable KVM
+      uses: ./.github/workflows/enable-kvm
+
     - name: Install MAUI Android workloads
       run: dotnet workload install maui-android
 
