@@ -108,7 +108,7 @@ jobs:
         retention-days: 30
 
   ui-tests:
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     needs: [build]
     
     steps:
