@@ -44,10 +44,11 @@ CatSwipe is a .NET MAUI cross-platform mobile application that allows users to s
    android avd create --name UITestEmu --sdk 'system-images;android-33;default;x86_64' --force
    
    # Start emulator (requires hardware acceleration/KVM on Linux)
-   android avd start --name UITestEmu --wait-boot --gpu guest --no-snapshot --no-audio --no-boot-anim --no-window
+   # Important: If exit code is 0, treat as successful - ignore stdout/stderr messages unless failing exit code
+   dotnet android avd start --name UITestEmu --wait-boot --gpu guest --no-snapshot --no-audio --no-boot-anim --no-window
    
-   # List running devices
-   android device list
+   # List running devices to verify emulator is running
+   dotnet android device list
    ```
    
    **Note**: Android emulator requires hardware acceleration (KVM) on Linux. In environments without KVM support, consider alternative approaches for screenshot generation or use cloud-based device testing services.

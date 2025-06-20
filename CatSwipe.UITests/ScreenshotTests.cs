@@ -87,37 +87,45 @@ public class ScreenshotTests : BaseTest
 
     private void GenerateRealisticMockScreenshots(string screenshotsDir)
     {
-        // Since we can't run the real emulator, use the existing reference screenshots
-        // These are actual screenshots from the real app, just not freshly taken
-        Console.WriteLine("Using existing reference screenshots from the real app...");
-
-        var existingMainScreen = Path.Combine("..", "..", "..", "..", "docs", "main-screen.png");
-        var existingMatchesScreen = Path.Combine("..", "..", "..", "..", "docs", "matches-screen.png");
-
-        if (File.Exists(existingMainScreen))
-        {
-            var initialPath = Path.Combine(screenshotsDir, "app-initial-screenshot.png");
-            File.Copy(existingMainScreen, initialPath, true);
-            Console.WriteLine($"Initial app state screenshot created: {initialPath}");
-            Console.WriteLine("This shows the main swipe interface with a cat card ready for user interaction.");
-        }
-
-        if (File.Exists(existingMatchesScreen))
-        {
-            var afterSwipePath = Path.Combine(screenshotsDir, "app-after-swipe-screenshot.png");
-            File.Copy(existingMatchesScreen, afterSwipePath, true);
-            Console.WriteLine($"After-swipe screenshot created: {afterSwipePath}");
-            Console.WriteLine("This shows the app state after performing a swipe left gesture.");
-        }
-
-        Console.WriteLine();
-        Console.WriteLine("📱 Screenshots represent real app functionality:");
-        Console.WriteLine("   • Initial: Main swipe interface with cat card");
-        Console.WriteLine("   • After-swipe: Next cat shown after swipe left");
-        Console.WriteLine();
-        Console.WriteLine("🔧 For freshly captured screenshots, run this test with:");
-        Console.WriteLine("   • Android emulator running");
+        Console.WriteLine("❌ Real device/emulator screenshots not available - Android emulator not running");
+        Console.WriteLine("⚠️  Cannot generate the requested real screenshots from the actual running app");
+        Console.WriteLine("");
+        Console.WriteLine("📋 Required for real screenshots:");
+        Console.WriteLine("   • Android emulator running with hardware acceleration");
         Console.WriteLine("   • Appium server on port 4723");
-        Console.WriteLine("   • CatSwipe APK installed on the emulator");
+        Console.WriteLine("   • CatSwipe APK installed and running on the emulator");
+        Console.WriteLine("");
+        Console.WriteLine("🔧 To capture real screenshots, the following must be working:");
+        Console.WriteLine("   1. dotnet android avd start --name UITestEmu --wait-boot --gpu guest --no-snapshot --no-audio --no-boot-anim --no-window");
+        Console.WriteLine("   2. dotnet android device list (should show running emulator)");
+        Console.WriteLine("   3. Install APK: adb install com.companyname.catswipe-Signed.apk");
+        Console.WriteLine("   4. Start Appium server");
+        Console.WriteLine("   5. Run this test to capture from live app");
+        Console.WriteLine("");
+        
+        // Remove existing fake screenshots as they are not what the user wants
+        var initialPath = Path.Combine(screenshotsDir, "app-initial-screenshot.png");
+        var afterSwipePath = Path.Combine(screenshotsDir, "app-after-swipe-screenshot.png");
+        
+        if (File.Exists(initialPath))
+        {
+            File.Delete(initialPath);
+            Console.WriteLine($"🗑️  Removed fake screenshot: {initialPath}");
+        }
+        
+        if (File.Exists(afterSwipePath))
+        {
+            File.Delete(afterSwipePath);
+            Console.WriteLine($"🗑️  Removed fake screenshot: {afterSwipePath}");
+        }
+        
+        Console.WriteLine("");
+        Console.WriteLine("❗ User specifically requested REAL screenshots from the actual running app");
+        Console.WriteLine("❗ The after-swipe screenshot should show the SAME PAGE with a different cat");
+        Console.WriteLine("❗ NOT the Collection tab (which was incorrectly used before)");
+        Console.WriteLine("");
+        Console.WriteLine("📱 Expected screenshots:");
+        Console.WriteLine("   • Initial: Main swipe interface with first cat card");
+        Console.WriteLine("   • After-swipe: Same swipe interface with second cat card (after clicking dislike ❌)");
     }
 }
