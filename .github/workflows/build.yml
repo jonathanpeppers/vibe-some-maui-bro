@@ -131,6 +131,9 @@ jobs:
     - name: Restore Tools
       run: dotnet tool restore || echo "No tools to restore"
 
+    - name: Enable KVM
+      uses: ./.github/workflows/enable-kvm.yml
+
     - name: Boot Android emulator
       run: |
         # Use dotnet android tool to set up emulator
