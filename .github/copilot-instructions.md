@@ -32,6 +32,27 @@ CatSwipe is a .NET MAUI cross-platform mobile application that allows users to s
    - Follow MAUI Android setup: https://learn.microsoft.com/en-us/dotnet/maui/get-started/first-app?view=net-maui-9.0&tabs=vswin&pivots=devices-android
    - Install Android SDK and emulator if needed for testing
 
+4. **Android Emulator Setup for Screenshots and UI Testing**
+   ```bash
+   # Install Android SDK tools
+   dotnet tool install -g androidsdk.tool
+   
+   # Install system images for emulator
+   android sdk install --package 'system-images;android-33;default;x86_64'
+   
+   # Create Android Virtual Device (AVD)
+   android avd create --name UITestEmu --sdk 'system-images;android-33;default;x86_64' --force
+   
+   # Start emulator (requires hardware acceleration/KVM on Linux)
+   # Important: If exit code is 0, treat as successful - ignore stdout/stderr messages unless failing exit code
+   dotnet android avd start --name UITestEmu --wait-boot --gpu guest --no-snapshot --no-audio --no-boot-anim --no-window
+   
+   # List running devices to verify emulator is running
+   dotnet android device list
+   ```
+   
+   **Note**: Android emulator requires hardware acceleration (KVM) on Linux. In environments without KVM support, consider alternative approaches for screenshot generation or use cloud-based device testing services.
+
 ### Project Structure
 
 ```
